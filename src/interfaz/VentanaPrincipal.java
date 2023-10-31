@@ -1,6 +1,7 @@
 package interfaz;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
@@ -28,8 +29,14 @@ public class VentanaPrincipal extends JFrame
     private JPanel panelPrincipal;
     private JPanel panelNorth;
     private JPanel panelWest;
+    private JPanel panelCenter;
+    private CardLayout cardLayout;
 
-    final String pathImagenes = "src/interfaz/imagenes/";
+    private MenuInicio menuInicio;
+    private MenuPersonal menuPersonal;
+    private MenuEstudiantes menuEstudiantes;
+    private MenuBuscar menuBuscar;
+
     private int mouseX, mouseY;
 
     private enum Menu
@@ -51,6 +58,8 @@ public class VentanaPrincipal extends JFrame
     {
         "inicio_Activo.png", "personal_Activo.png", "estudiantes_Activo.png", "buscar_Activo.png"
     };
+
+    final String pathImagenes = "src/interfaz/imagenes/";
 
     public VentanaPrincipal()
     {
@@ -76,12 +85,18 @@ public class VentanaPrincipal extends JFrame
 
         panelNorth = new ImagenPanel(pathImagenes + "barra_titulo.png");
         panelWest = new JPanel();
+        panelCenter = new JPanel();
+
+        cardLayout = new CardLayout();
+        panelCenter.setLayout(cardLayout);
 
         initPanelNorth();
         initPanelWest();
+        initPanelCenter();
 
         panelPrincipal.add(panelNorth, BorderLayout.NORTH);
         panelPrincipal.add(panelWest, BorderLayout.WEST);
+        panelPrincipal.add(panelCenter, BorderLayout.CENTER);
     }
 
     /**
@@ -90,7 +105,7 @@ public class VentanaPrincipal extends JFrame
     private void initPanelNorth()
     {
 
-        JLabel icono = new JLabel(new ImageIcon(pathImagenes + "cora.png"));
+        JLabel icono = new JLabel(new ImageIcon(pathImagenes + "logo.png"));
         JLabel titulo = new JLabel("Departamento de Servicios de Salud");
         JLabel minimizar = new JLabel(new ImageIcon(pathImagenes + "minimizar.png"));
         JLabel redimencionar = new JLabel(new ImageIcon(pathImagenes + "redimencionar.png"));
@@ -190,7 +205,7 @@ public class VentanaPrincipal extends JFrame
     {
         panelWest.setBackground(new Color(236, 236, 236));
         panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS));
-        
+
         opcMenu[Menu.INICIO.ordinal()] = new JLabel(new ImageIcon(pathImagenes + imgMenuActivo[0]));
         opcMenu[Menu.PERSONAL.ordinal()] = new JLabel(new ImageIcon(pathImagenes + imgMenu[1]));
         opcMenu[Menu.ESTUDIANTES.ordinal()] = new JLabel(new ImageIcon(pathImagenes + imgMenu[2]));
@@ -351,6 +366,19 @@ public class VentanaPrincipal extends JFrame
         });
     }
 
+    private void initPanelCenter()
+    {
+        menuInicio = new MenuInicio();
+        menuPersonal = new MenuPersonal();
+        menuEstudiantes = new MenuEstudiantes();
+        menuBuscar = new MenuBuscar();
+
+        panelCenter.add(menuInicio, "Panel 0");
+        panelCenter.add(menuPersonal, "Panel 1");
+        panelCenter.add(menuEstudiantes, "Panel 2");
+        panelCenter.add(menuBuscar, "Panel 3");
+    }
+
     private void activarMenu(Menu menuIr)
     {
         if (menuIr != menuActivo)
@@ -358,7 +386,8 @@ public class VentanaPrincipal extends JFrame
             opcMenu[menuActivo.ordinal()].setIcon(new ImageIcon(pathImagenes + imgMenu[menuActivo.ordinal()]));
             opcMenu[menuIr.ordinal()].setIcon(new ImageIcon(pathImagenes + imgMenuActivo[menuIr.ordinal()]));
             menuActivo = menuIr;
+            cardLayout.show(panelCenter, "Panel " + menuActivo.ordinal());
         }
     }
-    
+
 }
