@@ -21,7 +21,7 @@ import javax.swing.border.LineBorder;
 
 /**
  *
- * @author alfrdo
+ * @author alfredo
  */
 public class VentanaPrincipal extends JFrame
 {
@@ -61,6 +61,8 @@ public class VentanaPrincipal extends JFrame
 
     final String pathImagenes = "src/interfaz/imagenes/";
 
+    private boolean maximized = true;
+
     public VentanaPrincipal()
     {
         initComponents();
@@ -83,7 +85,7 @@ public class VentanaPrincipal extends JFrame
         panelPrincipal.setLayout(new BorderLayout());
         panelPrincipal.setBorder(new LineBorder(Color.GRAY, 2));
 
-        panelNorth = new ImagenPanel(pathImagenes + "barra_titulo.png");
+        panelNorth = new ImagenPanel(new Color(133, 193, 233));
         panelWest = new JPanel();
         panelCenter = new JPanel();
 
@@ -105,6 +107,7 @@ public class VentanaPrincipal extends JFrame
     private void initPanelNorth()
     {
 
+        //panelNorth.setBackground(new Color(174, 214, 241));
         JLabel icono = new JLabel(new ImageIcon(pathImagenes + "logo.png"));
         JLabel titulo = new JLabel("Departamento de Servicios de Salud");
         JLabel minimizar = new JLabel(new ImageIcon(pathImagenes + "minimizar.png"));
@@ -114,7 +117,6 @@ public class VentanaPrincipal extends JFrame
         panelNorth.setLayout(new BoxLayout(panelNorth, BoxLayout.X_AXIS));
 
         minimizar.setToolTipText("Minimizar");
-        redimencionar.setToolTipText("Esta opcion se encuentra bloqueada");
         closed.setToolTipText("Cerrar");
 
         panelNorth.add(icono);
@@ -140,14 +142,44 @@ public class VentanaPrincipal extends JFrame
             {
                 minimizar.setIcon(new ImageIcon(pathImagenes + "minimizar.png"));
             }
-        });
 
-        minimizar.addMouseListener(new MouseAdapter()
-        {
             @Override
             public void mouseClicked(MouseEvent e)
             {
                 setExtendedState(JFrame.ICONIFIED);
+            }
+        });
+
+        redimencionar.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                String i = (maximized) ? "redimencionar_Hover.png" : "redimencionar2_Hover.png";
+                redimencionar.setIcon(new ImageIcon(pathImagenes + i));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                String i = (maximized) ? "redimencionar.png" : "redimencionar2.png";
+                redimencionar.setIcon(new ImageIcon(pathImagenes + i));
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if (maximized)
+                {
+                    setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar la ventana
+                    redimencionar.setToolTipText("Restaurar");
+                } else
+                {
+                    setExtendedState(JFrame.NORMAL); // Restaurar la ventana al tamaño original
+                    redimencionar.setToolTipText("Maximizar");
+                }
+                mouseExited(e);
+                maximized = !maximized; // Alternar el estado
             }
         });
 
@@ -164,10 +196,7 @@ public class VentanaPrincipal extends JFrame
             {
                 closed.setIcon(new ImageIcon(pathImagenes + "cerrar.png"));
             }
-        });
 
-        closed.addMouseListener(new MouseAdapter()
-        {
             @Override
             public void mouseClicked(MouseEvent e)
             {
@@ -201,6 +230,9 @@ public class VentanaPrincipal extends JFrame
         });
     }
 
+    /**
+     * Configura el panelWest Trabaja como la barra de menu
+     */
     private void initPanelWest()
     {
         panelWest.setBackground(new Color(236, 236, 236));
@@ -366,6 +398,9 @@ public class VentanaPrincipal extends JFrame
         });
     }
 
+    /**
+     * En el panelCenter se muestra la vista de cada opcion de menu
+     */
     private void initPanelCenter()
     {
         menuInicio = new MenuInicio();
@@ -389,5 +424,4 @@ public class VentanaPrincipal extends JFrame
             cardLayout.show(panelCenter, "Panel " + menuActivo.ordinal());
         }
     }
-
 }
