@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -26,24 +27,259 @@ import javax.swing.border.TitledBorder;
 public class Formulario extends JPanel
 {
 
-    private JTextField nombre = new JTextField(18);
-    public Formulario()
+    private JTextField cve;
+    private JTextField nombre;
+    private JTextField primerAp;
+    private JTextField segundoAp;
+    private char sexo;
+    private JCheckBox desnutricion;
+    private JCheckBox sobrepeso;
+    private JCheckBox alergias;
+    private JCheckBox obesidad;
+    private JCheckBox diabetes;
+    private JCheckBox otras;
+    private JTextField otrasCual;
+
+    private JComboBox estatus;
+    private JComboBox carrera;
+
+    private JCheckBox padecimientoActual;
+    private JTextArea padecimientoCual;
+    private JCheckBox antecedentes;
+    private JTextArea antecedentesCual;
+    private JCheckBox medicamento;
+    private JTextArea medicamentoCual;
+    private JCheckBox planTratamiento;
+    private JTextArea planTratamientoCual;
+    private JTextField fecha;
+
+    final private boolean type;
+
+    public Formulario(boolean type)
     {
         this.setLayout(new GridBagLayout());
+        this.type = type;
         initComponets();
     }
 
-    public Formulario(Color rgb)
+    public Formulario(Color rgb, boolean type)
     {
         this.setLayout(new GridBagLayout());
         this.setBackground(rgb);
+        this.type = type;
         initComponets();
+    }
+
+    /**
+     * @return the cve
+     */
+    public JTextField getCve()
+    {
+        return cve;
+    }
+
+    /**
+     * @return the primerAp
+     */
+    public JTextField getPrimerAp()
+    {
+        return primerAp;
+    }
+
+    /**
+     * @return the nombre
+     */
+    public JTextField getNombre()
+    {
+        return nombre;
+    }
+
+    /**
+     * @return the segundoAp
+     */
+    public JTextField getSegundoAp()
+    {
+        return segundoAp;
+    }
+
+    /**
+     * @return the sexo
+     */
+    public char getSexo()
+    {
+        return sexo;
+    }
+
+    /**
+     * @return the desnutricion
+     */
+    public JCheckBox getDesnutricion()
+    {
+        return desnutricion;
+    }
+
+    /**
+     * @return the sobrepeso
+     */
+    public JCheckBox getSobrepeso()
+    {
+        return sobrepeso;
+    }
+
+    /**
+     * @return the alergias
+     */
+    public JCheckBox getAlergias()
+    {
+        return alergias;
+    }
+
+    /**
+     * @return the obesidad
+     */
+    public JCheckBox getObesidad()
+    {
+        return obesidad;
+    }
+
+    /**
+     * @return the diabetes
+     */
+    public JCheckBox getDiabetes()
+    {
+        return diabetes;
+    }
+
+    /**
+     * @return the otras
+     */
+    public JCheckBox getOtras()
+    {
+        return otras;
+    }
+
+    /**
+     * @return the otrasCual
+     */
+    public JTextField getOtrasCual()
+    {
+        return otrasCual;
+    }
+
+    /**
+     * @return the estatus
+     */
+    public JComboBox getEstatus()
+    {
+        return estatus;
+    }
+
+    /**
+     * @return the carrera
+     */
+    public JComboBox getCarrera()
+    {
+        return carrera;
+    }
+
+    /**
+     * @return the padecimientoActual
+     */
+    public JCheckBox getPadecimientoActual()
+    {
+        return padecimientoActual;
+    }
+
+    /**
+     * @return the padecimientoCual
+     */
+    public JTextArea getPadecimientoCual()
+    {
+        return padecimientoCual;
+    }
+
+    /**
+     * @return the antecedentes
+     */
+    public JCheckBox getAntecedentes()
+    {
+        return antecedentes;
+    }
+
+    /**
+     * @return the antecedentesCual
+     */
+    public JTextArea getAntecedentesCual()
+    {
+        return antecedentesCual;
+    }
+
+    /**
+     * @return the medicamento
+     */
+    public JCheckBox getMedicamento()
+    {
+        return medicamento;
+    }
+
+    /**
+     * @return the medicamentoCual
+     */
+    public JTextArea getMedicamentoCual()
+    {
+        return medicamentoCual;
+    }
+
+    /**
+     * @return the planTratamiento
+     */
+    public JCheckBox getPlanTratamiento()
+    {
+        return planTratamiento;
+    }
+
+    /**
+     * @return the planTratamientoCual
+     */
+    public JTextArea getPlanTratamientoCual()
+    {
+        return planTratamientoCual;
+    }
+
+    /**
+     * @return the fecha
+     */
+    public JTextField getFecha()
+    {
+        return fecha;
     }
 
     private void initComponets()
     {
-        GridBagConstraints gbc = new GridBagConstraints();
+        cve = new JTextField(12);
+        nombre = new JTextField(18);
+        primerAp = new JTextField(18);
+        segundoAp = new JTextField(18);
+        sexo = 'H';
+        desnutricion = new JCheckBox("Desnutricion");
+        sobrepeso = new JCheckBox("Sobrepeso");
+        alergias = new JCheckBox("Alergias");
+        obesidad = new JCheckBox("Obesidad");
+        diabetes = new JCheckBox("Diabetes");
+        otras = new JCheckBox("Otras");
+        otrasCual = new JTextField(18);
+        
+        padecimientoActual = new JCheckBox("Padecimineto Actual");
+        padecimientoCual = new JTextArea(7, 35);
+        antecedentes = new JCheckBox("Antecedentes");
+        antecedentesCual = new JTextArea(7, 35);
+        medicamento = new JCheckBox("Medicamento");
+        medicamentoCual = new JTextArea(7, 35);
+        planTratamiento = new JCheckBox("Plan de tratamiento");
+        planTratamientoCual = new JTextArea(7, 35);
+        fecha = new JTextField(6);
 
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -57,30 +293,52 @@ public class Formulario extends JPanel
         gbc.gridy = 1;
         JPanel contenedor1 = new JPanel(new FlowLayout());
         contenedor1.add(new JLabel("Clave"));
-        contenedor1.add(new JTextField(12));
+        contenedor1.add(cve);
         this.add(contenedor1, gbc);
 
         gbc.gridx = 1;
-        this.add(new JTextField(18), gbc);
+        this.add(nombre, gbc);
         gbc.gridx = 2;
-        this.add(getNombre(), gbc);
+        this.add(primerAp, gbc);
         gbc.gridx = 3;
-        this.add(new JTextField(18), gbc);
+        this.add(segundoAp, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-        String[] opcEstatus =
+
+        String[] opcEstatus;
+        String[] opcCarrera;
+        if (type)
         {
-            "Base", "Temporal"
-        };
+            opcEstatus = new String[]
+            {
+                "","Base", "Temporal"
+            };
+        } else
+        {
+            opcEstatus = new String[]
+            {
+                "","Mamá", "Papá", "Ambos"
+            };
+            opcCarrera = new String[]
+            {
+              "","Carrera 1" , "Carrera 2", "Carrera 3", "Carrera 4"
+            };
+            JPanel contenerdor = new JPanel();
+            carrera = new JComboBox(opcCarrera);
+            contenerdor.add(new JLabel("Carrera"));
+            contenerdor.add(carrera);
+            this.add(contenerdor, gbc);
+            gbc.gridx = 1;            
+        }
+
         JPanel contenedor2 = new JPanel(new FlowLayout());
-        JComboBox estatus = new JComboBox(opcEstatus);
-        contenedor2.add(new JLabel("Estatus"));
+        estatus = new JComboBox(opcEstatus);
+        contenedor2.add(new JLabel((type) ? "Estatus" : "Vive Con"));
         contenedor2.add(estatus);
         this.add(contenedor2, gbc);
 
         gbc.gridx = 2;
-        gbc.gridy = 2;
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Sexo");
         JPanel panelSexo = new JPanel();
         panelSexo.setBorder(titledBorder);
@@ -93,96 +351,60 @@ public class Formulario extends JPanel
         panelSexo.add(radioButton2);
         this.add(panelSexo, gbc);
 
+        gbc.gridx = 3;
+        JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        contenedor.add(new JLabel("Fecha"));
+        contenedor.add(fecha);
+        this.add(contenedor, gbc);
+
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 4;
         JPanel panelPadecimientos = new JPanel();
         titledBorder = BorderFactory.createTitledBorder("Padecimientos");
         panelPadecimientos.setBorder(titledBorder);
-        JCheckBox desnutricion = new JCheckBox("Desnutricion");
-        JCheckBox sobrepeso = new JCheckBox("Sobrepeso");
-        JCheckBox alergias = new JCheckBox("Alergias");
-        JCheckBox obesidad = new JCheckBox("Obesidad");
-        JCheckBox diabetes = new JCheckBox("Diabetes");
-        JCheckBox otras = new JCheckBox("Otras");
-        JTextField otrasText = new JTextField(10);
+
         panelPadecimientos.add(desnutricion);
         panelPadecimientos.add(sobrepeso);
         panelPadecimientos.add(alergias);
         panelPadecimientos.add(obesidad);
         panelPadecimientos.add(diabetes);
         panelPadecimientos.add(otras);
-        panelPadecimientos.add(otrasText);
+        panelPadecimientos.add(otrasCual);
         this.add(panelPadecimientos, gbc);
 
         JPanel contenedor3 = new JPanel();
         contenedor3.setLayout(new BoxLayout(contenedor3, BoxLayout.Y_AXIS));
-        JCheckBox padecimientoActual = new JCheckBox("Padecimiento Actual");
         gbc.gridy = 4;
         gbc.gridwidth = 2;
-        JTextArea text1 = new JTextArea(7, 35);
-        JScrollPane scrollPane1 = new JScrollPane(text1);
+        JScrollPane scrollPane1 = new JScrollPane(padecimientoCual);
         contenedor3.add(padecimientoActual);
         contenedor3.add(scrollPane1);
         this.add(contenedor3, gbc);
 
         JPanel contenedor4 = new JPanel();
         contenedor4.setLayout(new BoxLayout(contenedor4, BoxLayout.Y_AXIS));
-        JCheckBox medicamento = new JCheckBox("Medicamento");
+
         gbc.gridy = 5;
-        JTextArea text2 = new JTextArea(7, 35);
-        JScrollPane scrollPane2 = new JScrollPane(text2);
+        JScrollPane scrollPane2 = new JScrollPane(medicamentoCual);
         contenedor4.add(medicamento);
         contenedor4.add(scrollPane2);
         this.add(contenedor4, gbc);
 
         JPanel contenedor5 = new JPanel();
         contenedor5.setLayout(new BoxLayout(contenedor5, BoxLayout.Y_AXIS));
-        JCheckBox antecedentes = new JCheckBox("Antecedentes");
         gbc.gridx = 2;
-        JTextArea text3 = new JTextArea(7, 35);
-        JScrollPane scrollPane3 = new JScrollPane(text3);
+        JScrollPane scrollPane3 = new JScrollPane(antecedentesCual);
         contenedor5.add(antecedentes);
         contenedor5.add(scrollPane3);
         this.add(contenedor5, gbc);
 
         JPanel contenedor6 = new JPanel();
         contenedor6.setLayout(new BoxLayout(contenedor6, BoxLayout.Y_AXIS));
-        JCheckBox tratamiento = new JCheckBox("Tratamiento");
         gbc.gridy = 4;
-        JTextArea text4 = new JTextArea(7, 35);
-        JScrollPane scrollPane4 = new JScrollPane(text4);
-        contenedor6.add(tratamiento);
+        JScrollPane scrollPane4 = new JScrollPane(planTratamientoCual);
+        contenedor6.add(planTratamiento);
         contenedor6.add(scrollPane4);
         this.add(contenedor6, gbc);
-
-        JPanel contenedor7 = new JPanel();
-        //contenedor6.setLayout(new BoxLayout(contenedor6, BoxLayout.Y_AXIS));
-        gbc.gridx = 2;
-        gbc.gridy = 6;
-        gbc.gridwidth = 1;
-        JButton btn = new JButton("Cancelar");
-        contenedor7.add(btn, gbc);
-        gbc.gridx = 3;
-        JButton btn2 = new JButton("Guardar");
-        contenedor7.add(btn2, gbc);
-        //this.add(contenedor7, gbc);
     }
-
-    /**
-     * @return the nombre
-     */
-    public JTextField getNombre()
-    {
-        return nombre;
-    }
-
-    /**
-     * @param nombre the nombre to set
-     */
-    public void setNombre(JTextField nombre)
-    {
-        this.nombre = nombre;
-    }
-
 }
