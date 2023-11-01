@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author admin
+ * @author alfredo
  */
 public class MenuEstudiantes extends JPanel
 {
