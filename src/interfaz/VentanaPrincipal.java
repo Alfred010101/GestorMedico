@@ -69,7 +69,7 @@ public class VentanaPrincipal extends JFrame
 
         menuActivo = Menu.INICIO;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setResizable(false);
+        //this.setResizable(false);
         this.setUndecorated(true);
         this.add(panelPrincipal);
         this.setSize(1200, 700);

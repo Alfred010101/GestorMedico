@@ -5,11 +5,12 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -407,6 +408,15 @@ public class Formulario extends JPanel
         contenedor6.add(planTratamiento);
         contenedor6.add(scrollPane4);
         this.add(contenedor6, gbc);
+        
+        nombre.addKeyListener(new KeyAdapter(){
+           @Override
+            public void keyTyped(KeyEvent e) {
+                ctrl.Validaciones.validaAlfabeticos(e, 15, nombre.getText());
+                //char c = e.getKeyChar();
+                //System.out.println("Tecla Typed: " + c);
+            } 
+        });
     }
     
     public void habilitarComponentes(boolean enable)

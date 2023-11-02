@@ -35,7 +35,7 @@ public class MenuPersonal extends JPanel
 
     private JPanel panelHerramientas;
     private JPanel panelAreaTrabajo;
-    private JTabbedPane tabbedPane = new JTabbedPane();
+    private JTabbedPane tabbedPane;
     final String pathImagenes = "src/interfaz/imagenes/";
 
     public MenuPersonal()
@@ -43,7 +43,7 @@ public class MenuPersonal extends JPanel
         this.setBackground(Color.WHITE);
         this.setLayout(new BorderLayout());
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
-
+        
         initPanelNorth();
         initPanelSouth();
 
@@ -73,6 +73,7 @@ public class MenuPersonal extends JPanel
     
     private void initPanelSouth()
     {
+        tabbedPane = new JTabbedPane();
         panelAreaTrabajo = new JPanel();
         panelAreaTrabajo.setBackground(Color.WHITE);
         panelAreaTrabajo.setBorder(new EmptyBorder(20, 0, 0, 0));
