@@ -52,7 +52,8 @@ public class Formulario extends JPanel
     private JCheckBox planTratamiento;
     private JTextArea planTratamientoCual;
     private JTextField fecha;
-
+    private JRadioButton radioButton1;
+    private JRadioButton radioButton2;
     final private boolean type;
 
     public Formulario(boolean type)
@@ -342,8 +343,8 @@ public class Formulario extends JPanel
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Sexo");
         JPanel panelSexo = new JPanel();
         panelSexo.setBorder(titledBorder);
-        JRadioButton radioButton1 = new JRadioButton("Hombre");
-        JRadioButton radioButton2 = new JRadioButton("Mujer");
+        radioButton1 = new JRadioButton("Hombre");
+        radioButton2 = new JRadioButton("Mujer");
         ButtonGroup group = new ButtonGroup();
         group.add(radioButton1);
         group.add(radioButton2);
@@ -406,5 +407,36 @@ public class Formulario extends JPanel
         contenedor6.add(planTratamiento);
         contenedor6.add(scrollPane4);
         this.add(contenedor6, gbc);
+    }
+    
+    public void habilitarComponentes(boolean enable)
+    {
+        cve.setEnabled(false);
+        nombre.setEnabled(false);
+        primerAp.setEnabled(false);
+        segundoAp.setEnabled(false);
+        estatus.setEnabled(enable);
+        if(!type)
+        {
+            carrera.setEditable(enable);        
+        }
+        radioButton1.setEnabled(enable);
+        radioButton2.setEnabled(enable);
+        fecha.setEnabled(enable);
+        desnutricion.setEnabled(enable);
+        sobrepeso.setEnabled(enable);
+        alergias.setEnabled(enable);
+        obesidad.setEnabled(enable);
+        diabetes.setEnabled(enable);
+        otras.setEnabled(enable);
+        otrasCual.setEnabled(enable);
+        padecimientoActual.setEnabled(enable);
+        padecimientoCual.setEnabled(enable);
+        medicamento.setEnabled(enable);
+        medicamentoCual.setEnabled(enable);
+        planTratamiento.setEnabled(enable);
+        planTratamientoCual.setEnabled(enable);
+        antecedentes.setEnabled(enable);
+        antecedentesCual.setEnabled(enable);
     }
 }

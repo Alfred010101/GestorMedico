@@ -9,7 +9,6 @@ import java.awt.RenderingHints;
 import java.text.DecimalFormat;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 /**
  *
@@ -37,28 +36,11 @@ public class MenuInicio extends JPanel
         panelC = new JPanel(new BorderLayout());
         panelD = new JPanel(new BorderLayout());
 
-        //JButton btn1 = new JButton("boton 1");
-//        JButton btn2 = new JButton("boton 2");
-//        JButton btn3 = new JButton("boton 3");
-//        JButton btn4 = new JButton("boton 4");
-//        
-        //panelA.add(btn1);
-//        btn2.setBounds(50, 100, 90, 25);
-//        
-//        panelC.add(btn3);
-//        panelD.add(btn4);
-//        RotarLabel lbl = new RotarLabel("Variable", -45);
-//        RotarLabel lbl2 = new RotarLabel("Variable", -90);
-//       // lbl.setBorder(new LineBorder(Color.yellow, 1));
-//      lbl.setBounds(50, 100, lbl.getPreferredSize().width, lbl.getPreferredSize().height);
-//      lbl2.setBounds(90, 100, lbl.getPreferredSize().width, lbl.getPreferredSize().height);
-//        panelB.add(lbl);
-//        panelB.add(btn2);
-//        panelB.add(lbl2);
         initPanelA();
         initPanelB();
         initPanelC();
         initPanelD();
+        
         this.add(panelA);
         this.add(panelB);
         this.add(panelC);
@@ -122,7 +104,7 @@ public class MenuInicio extends JPanel
         {
             Color.BLUE, Color.ORANGE, Color.PINK, Color.YELLOW, Color.GREEN, Color.PINK
         };
-        GraficoDeLineas graficoBarras = new GraficoDeLineas("Comparacion de Consultas", datos, relleno);
+        GraficoDeLineas graficoBarras = new GraficoDeLineas("Comparacion de consultas semanales", datos, relleno);
         panelC.add(graficoBarras);
     }
 
@@ -237,44 +219,7 @@ class GraficoBarras extends JPanel
             }
         }
     }
-//    @Override
-//    protected void paintComponent(Graphics g)
-//    {
-//        super.paintComponent(g);
-//        int width = getWidth();
-//        int height = getHeight();
-//        generarProporciones();
-//        System.out.println("");
-//        // Dibujar ejes X y Y
-//        g.drawLine(30, height - 30, width - 30, height - 30);  // Eje X
-//        g.drawLine(30, 30, 30, height - 30);  // Eje Y
-//
-//        int incrementX = (width - 60) / 18;
-//        int tab = 0;
-//        int x = 30 + incrementX;
-//        for (int i = 0; i < 6; i++)
-//        {
-//            g.setColor(Color.BLUE);
-//            g.fillRect(x, height - 35, incrementX, hombres[i] * -1);
-//            tab++;
-//            x += incrementX;
-//            g.setColor(Color.PINK);
-//            g.fillRect(x, height - 35, incrementX, mujeres[i] * -1);
-//            x += incrementX * 2;
-//        }
-//        
-//        g.setColor(new Color(51, 51, 51));
-//        // Dibujar graduaciones en el eje Y
-//        int incrementY = (height - 60) / 10;
-//        int tamanoParte = (int) Math.ceil((double) datoMayor / 10);
-//        for (int i = 0; i <= 10; i++)
-//        {
-//            int numero = (int) Math.round(i * tamanoParte);
-//            int y = height - 30 - i * incrementY;
-//            g.drawLine(25, y, 35, y);
-//            g.drawString(String.valueOf(numero), 5, y + 5);
-//        }
-//    }
+
 }
 
 class GraficoDeLineas extends JPanel
@@ -372,71 +317,8 @@ class GraficoDeLineas extends JPanel
     }
 }
 
-/*class GraficoPastel extends JPanel {
-    private final int[] datos;
-    String[] encabezados;
-    Color[] relleno;
-
-    public GraficoPastel(String titulo, String[] encabezados, int[] datos, Color[] relleno) {
-        this.datos = datos;
-        this.encabezados = encabezados;
-        this.relleno = relleno;
-        this.setBackground(Color.WHITE);
-        this.add(new JLabel(titulo));
-        this.setBorder(new LineBorder(Color.GRAY, 1));
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        int total = sumaTotal();
-        int startAngle = 0;
-
-        int width = getWidth();
-        int height = getHeight();
-        int diameter = Math.min(width, height) - 40;
-        int x = (width - diameter) / 2;
-        int y = (height - diameter) / 2;
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        for (int i = 0; i < datos.length; i++)
-        {
-            drawPieSlice(g2d, x, y, diameter, startAngle, 360 * datos[i] / total, relleno[i], encabezados[i]);
-            startAngle += 360 * datos[i] / total;
-        }
-    }
-    
-    private int sumaTotal()
-    {
-        int sumaT = 0;
-        for (int i = 0; i < datos.length; i++)
-        {
-            sumaT += datos[i];
-        }
-        return sumaT;
-    }
-
-    private void drawPieSlice(Graphics2D g, int x, int y, int diameter, int startAngle, int arcAngle, Color color, String label) {
-        g.setColor(color);
-        g.fillArc(x, y, diameter, diameter, startAngle, arcAngle);
-        g.setColor(Color.BLACK);
-//        int labelX = (int) (x + diameter / 2 * Math.cos(Math.toRadians(startAngle + arcAngle / 2)));
-//        int labelY = (int) (y + diameter / 2 * Math.sin(Math.toRadians(startAngle + arcAngle / 2)));
-//        g.drawLine(x + diameter / 2, y + diameter / 2, labelX, labelY);
-//        g.drawString(label, labelX, labelY);
-//        g.drawString(formatPercentage(arcAngle), labelX + 30, labelY);
-    }
-
-    private String formatPercentage(int value) {
-        DecimalFormat df = new DecimalFormat("0.##");
-        return df.format((double) value / 360 * 100) + "%";
-    }
-}*/
 class GraficoPastel extends JPanel
 {
-
     private final int[] datos;
     String[] encabezados;
     Color[] relleno;
@@ -461,7 +343,7 @@ class GraficoPastel extends JPanel
         int width = getWidth();
         int height = getHeight();
         int diameter = Math.min(width, height) - 40;
-        System.out.println("D : " + diameter + " H : " + getHeight() + " W : " + getWidth());
+        //System.out.println("D : " + diameter + " H : " + getHeight() + " W : " + getWidth());
         int x = (width - diameter) / 2;
         int y = (height - diameter) / 2 + 10;
 
