@@ -413,8 +413,8 @@ public class Formulario extends JPanel
            @Override
             public void keyTyped(KeyEvent e) {
                 ctrl.Validaciones.validaAlfabeticos(e, 15, nombre.getText());
-                //char c = e.getKeyChar();
-                //System.out.println("Tecla Typed: " + c);
+                char c = e.getKeyChar();
+                System.out.println("Tecla Typed: " + c);
             } 
         });
     }
