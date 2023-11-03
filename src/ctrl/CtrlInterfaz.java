@@ -6,6 +6,7 @@
 package ctrl;
 
 import java.awt.Color;
+import java.awt.event.ItemEvent;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -45,7 +46,6 @@ public class CtrlInterfaz
             {
                 ((JTextArea) x).setText("");
             }
-
         }
     }
 
@@ -127,6 +127,10 @@ public class CtrlInterfaz
         {
             ((JRadioButton) obj).requestFocus();
         }
+        if (obj instanceof JCheckBox)
+        {
+            ((JCheckBox) obj).requestFocus();
+        }
     }
 
     /**
@@ -202,5 +206,29 @@ public class CtrlInterfaz
             ((JPanel)jf).setBackground(c);
         }
             
+    }
+    
+    public static void itemStateChanged(Object obj, ItemEvent e)
+    {
+        if(obj instanceof JTextArea)
+        {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                ((JTextArea)obj).setEnabled(true);
+                ctrl.CtrlInterfaz.cambia(obj);
+            } else {
+                ((JTextArea)obj).setEnabled(false);
+                ((JTextArea)obj).setText("");
+            }
+        }
+        if (obj instanceof JTextField)
+        {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                ((JTextField)obj).setEnabled(true);
+                ctrl.CtrlInterfaz.cambia(obj);
+            } else {
+                ((JTextField)obj).setEnabled(false);
+                ((JTextField)obj).setText("");
+            }
+        }
     }
 }

@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -271,15 +273,20 @@ public class Formulario extends JPanel
         diabetes = new JCheckBox("Diabetes");
         otras = new JCheckBox("Otras");
         otrasCual = new JTextField(18);
+        otrasCual.setEnabled(false);
         
         padecimientoActual = new JCheckBox("Padecimineto Actual");
         padecimientoCual = new JTextArea(7, 35);
+        padecimientoCual.setEnabled(false);
         antecedentes = new JCheckBox("Antecedentes");
         antecedentesCual = new JTextArea(7, 35);
+        antecedentesCual.setEnabled(false);
         medicamento = new JCheckBox("Medicamento");
         medicamentoCual = new JTextArea(7, 35);
+        medicamentoCual.setEnabled(false);
         planTratamiento = new JCheckBox("Plan de tratamiento");
         planTratamientoCual = new JTextArea(7, 35);
+        planTratamientoCual.setEnabled(false);
         fecha = new JTextField(6);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -319,31 +326,32 @@ public class Formulario extends JPanel
         panelSexo.add(radioButton1);
         panelSexo.add(radioButton2);
         this.add(panelSexo, gbc);
-        
+
         gbc.gridx = 2;
         String[] opcEstatus;
         if (type)
         {
             opcEstatus = new String[]
             {
-                "","Base", "Temporal"
+                "", "Base", "Temporal"
             };
+            carrera = new JComboBox(opcEstatus);
         } else
         {
             opcEstatus = new String[]
             {
-                "","Mamá", "Papá", "Ambos"
+                "", "Mamá", "Papá", "Ambos"
             };
             String[] opcCarrera = new String[]
             {
-              "","Carrera 1" , "Carrera 2", "Carrera 3", "Carrera 4"
+                "", "Carrera 1", "Carrera 2", "Carrera 3", "Carrera 4"
             };
             JPanel contenerdor = new JPanel();
             carrera = new JComboBox(opcCarrera);
             contenerdor.add(new JLabel("Carrera"));
             contenerdor.add(carrera);
             this.add(contenerdor, gbc);
-            gbc.gridx = 1;            
+            gbc.gridx = 1;
         }
 
         JPanel contenedor2 = new JPanel(new FlowLayout());
@@ -407,101 +415,188 @@ public class Formulario extends JPanel
         contenedor6.add(planTratamiento);
         contenedor6.add(scrollPane4);
         this.add(contenedor6, gbc);
-        
-        cve.addKeyListener(new KeyAdapter(){
-           @Override
-            public void keyTyped(KeyEvent e) {
+
+        cve.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
                 ctrl.Validaciones.validaAlfanumerico(e, 15, cve.getText());
                 //char c = e.getKeyChar();
                 //System.out.println("Tecla Typed: " + c);
-            } 
-            
-           @Override
-            public void keyPressed(KeyEvent e) {
-                enterKeyPressed(e, cve.getText(), nombre);
-            } 
-        });
-        nombre.addKeyListener(new KeyAdapter(){
-           @Override
-            public void keyTyped(KeyEvent e) {
-                ctrl.Validaciones.validaAlfabeticos(e, 30, nombre.getText());
-            } 
-            
-            @Override
-            public void keyPressed(KeyEvent e) {
-                enterKeyPressed(e, nombre.getText(), primerAp);
-            }
-        });
-        primerAp.addKeyListener(new KeyAdapter(){
-           @Override
-            public void keyTyped(KeyEvent e) {
-                ctrl.Validaciones.validaAlfabeticos(e, 30, primerAp.getText());
-            }
-            @Override
-            public void keyPressed(KeyEvent e) {
-                enterKeyPressed(e, primerAp.getText(), segundoAp);
-            }
-        });
-        segundoAp.addKeyListener(new KeyAdapter(){
-           @Override
-            public void keyTyped(KeyEvent e) {
-                
-                ctrl.Validaciones.validaAlfabeticos(e, 30, segundoAp.getText());
-            } 
-            @Override
-            public void keyPressed(KeyEvent e) {
-                enterKeyPressed(e, segundoAp.getText(), radioButton1);
-            }
-        });
-        
-//        radioButton1.addKeyListener(new KeyListener() {
-//            @Override
-//            public void keyTyped(KeyEvent e) {
-//            }
-//
-//            @Override
-//            public void keyPressed(KeyEvent e) {
-//                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-//                    if (radioButton1.isSelected()) {
-//                        enterKeyPressed(e, radioButton1.getText(), estatus);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void keyReleased(KeyEvent e) {
-//            }
-//            
-//        });
-        
-        radioButton1.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
             }
 
             @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    if (radioButton1.isSelected()) {
-                        // Ejecutar la acción cuando el JRadioButton está seleccionado y se presiona "Enter"
-                        System.out.println("Radio Button Seleccionado y Enter Presionado");
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, cve.getText(), nombre);
+            }
+        });
+        nombre.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, nombre.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, nombre.getText(), primerAp);
+            }
+        });
+        primerAp.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, primerAp.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, primerAp.getText(), segundoAp);
+            }
+        });
+        segundoAp.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, segundoAp.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, segundoAp.getText(), radioButton1);
+            }
+        });
+        radioButton1.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && radioButton1.isSelected())
+                {
+                    enterKeyPressed(e, radioButton1.getText(), estatus);
+                }
+            }
+        });
+        radioButton2.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && radioButton2.isSelected())
+                {
+                    enterKeyPressed(e, radioButton2.getText(), estatus);
+                }
+            }
+        });
+        estatus.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && estatus.getSelectedIndex() != 0)
+                {
+                    if (type)
+                    {
+                        enterKeyPressed(e, " ", fecha);
+                    } else
+                    {
+                        enterKeyPressed(e, " ", carrera);
                     }
                 }
             }
+        });
+        carrera.addKeyListener(new KeyAdapter()
+        {
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && estatus.getSelectedIndex() != 0)
+                {
+                    enterKeyPressed(e, " ", fecha);
+                }
+            }
+        });
+        fecha.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validarFecha(e, fecha.getText(), 10);
+            }
+            
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, fecha.getText(), desnutricion);
+            }
+        });
+        
+        otras.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(otrasCual, e);
+            }
+        });
+        otrasCual.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, otrasCual.getText(), padecimientoActual);
+            }
+        });
+        padecimientoActual.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(padecimientoCual, e);
+            }
+        });
+        planTratamiento.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(planTratamientoCual, e);
+            }
+        });
+        medicamento.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(medicamentoCual, e);
+            }
+        });
+        antecedentes.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(antecedentesCual, e);
             }
         });
     }
-    
+
     private void enterKeyPressed(KeyEvent e, String s, Object obj)
     {
-        
-        if(!s.isEmpty())
+        if (!s.isEmpty())
         {
-            ctrl.Validaciones.enter(this , e, obj); 
+            ctrl.Validaciones.enter(this, e, obj);
         }
     }
+
     public void habilitarComponentes(boolean enable)
     {
         cve.setEnabled(false);
@@ -509,9 +604,9 @@ public class Formulario extends JPanel
         primerAp.setEnabled(false);
         segundoAp.setEnabled(false);
         estatus.setEnabled(enable);
-        if(!type)
+        if (!type)
         {
-            carrera.setEditable(enable);        
+            carrera.setEditable(enable);
         }
         radioButton1.setEnabled(enable);
         radioButton2.setEnabled(enable);

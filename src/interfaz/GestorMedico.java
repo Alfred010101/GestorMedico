@@ -19,8 +19,6 @@ public class GestorMedico
                  VentanaPrincipal frame = new VentanaPrincipal();
                 frame.setVisible(true);
                 frame.setLocationRelativeTo(null);
-
-                
             } catch (Exception e)
             {
             }

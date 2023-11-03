@@ -838,4 +838,38 @@ public class Validaciones
         }
         return false;
     }
+    
+    public static void validarFecha( KeyEvent ke, String s, int length)
+    {
+        if(ke.getKeyChar() != '/' && ke.getKeyChar() != '-' || s.length() == length)
+        {
+            validaEntero(ke, length, s);
+        }else
+        {
+            if(s.isEmpty() || s.charAt(s.length() -1) == '/' || s.charAt(s.length() -1) == '-' 
+                    || contCaracter(s, '/') == 2 || contCaracter(s, '-') == 2
+                || (contCaracter(s, '/') > 0 && ke.getKeyChar() == '-')
+                    || (contCaracter(s, '-') > 0 && ke.getKeyChar() == '/'))
+            {
+                ke.consume();
+            }
+        }
+    }
+    
+    public static int contCaracter(String s, char c)
+    {
+        int cont = 0;
+        
+        if(!s.isEmpty())
+        {
+            for (int i = 0; i < s.length(); i++)
+            {
+                if(s.charAt(i) == c)
+                {
+                    cont++;
+                }
+            }
+        }
+        return cont;
+    }
 }
