@@ -10,9 +10,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,6 +25,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -90,6 +95,44 @@ public class MenuPersonal extends JPanel
                 //JOptionPane.showMessageDialog(null, "Se cambió a la pestaña " + selectedIndex);
             }
         });
+        
+        KeyStroke keyCtrl1 = KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyCtrl2 = KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyCtrl3 = KeyStroke.getKeyStroke(KeyEvent.VK_3, KeyEvent.CTRL_DOWN_MASK);
+
+        Action actionCtrl1 = new AbstractAction("Pestaña_1")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                tabbedPane.setSelectedIndex(0);
+            }
+        };
+        Action actionCtrl2 = new AbstractAction("Pestaña_2")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                tabbedPane.setSelectedIndex(1);
+            }
+        };
+        Action actionCtrl3 = new AbstractAction("Pestaña_3")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                tabbedPane.setSelectedIndex(2);
+            }
+        };
+        
+        tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCtrl1, "Pestaña_1");
+        tabbedPane.getActionMap().put("Pestaña_1", actionCtrl1);
+        tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCtrl2, "Pestaña_2");
+        tabbedPane.getActionMap().put("Pestaña_2", actionCtrl2);
+        tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCtrl3, "Pestaña_3");
+        tabbedPane.getActionMap().put("Pestaña_3", actionCtrl3);
+        
+        
         panelAreaTrabajo.add(tabbedPane, BorderLayout.CENTER);
     }
     
