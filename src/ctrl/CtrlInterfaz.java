@@ -6,6 +6,7 @@
 package ctrl;
 
 import java.awt.Color;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -13,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
@@ -120,6 +122,10 @@ public class CtrlInterfaz
         if (obj instanceof JTextArea)
         {
             ((JTextArea) obj).requestFocus();
+        }
+        if (obj instanceof JRadioButton)
+        {
+            ((JRadioButton) obj).requestFocus();
         }
     }
 

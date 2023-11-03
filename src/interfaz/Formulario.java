@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -307,9 +308,20 @@ public class Formulario extends JPanel
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-
+        TitledBorder titledBorder = BorderFactory.createTitledBorder("Sexo");
+        JPanel panelSexo = new JPanel();
+        panelSexo.setBorder(titledBorder);
+        radioButton1 = new JRadioButton("Hombre");
+        radioButton2 = new JRadioButton("Mujer");
+        ButtonGroup group = new ButtonGroup();
+        group.add(radioButton1);
+        group.add(radioButton2);
+        panelSexo.add(radioButton1);
+        panelSexo.add(radioButton2);
+        this.add(panelSexo, gbc);
+        
+        gbc.gridx = 2;
         String[] opcEstatus;
-        String[] opcCarrera;
         if (type)
         {
             opcEstatus = new String[]
@@ -322,7 +334,7 @@ public class Formulario extends JPanel
             {
                 "","Mamá", "Papá", "Ambos"
             };
-            opcCarrera = new String[]
+            String[] opcCarrera = new String[]
             {
               "","Carrera 1" , "Carrera 2", "Carrera 3", "Carrera 4"
             };
@@ -339,19 +351,6 @@ public class Formulario extends JPanel
         contenedor2.add(new JLabel((type) ? "Estatus" : "Vive Con"));
         contenedor2.add(estatus);
         this.add(contenedor2, gbc);
-
-        gbc.gridx = 2;
-        TitledBorder titledBorder = BorderFactory.createTitledBorder("Sexo");
-        JPanel panelSexo = new JPanel();
-        panelSexo.setBorder(titledBorder);
-        radioButton1 = new JRadioButton("Hombre");
-        radioButton2 = new JRadioButton("Mujer");
-        ButtonGroup group = new ButtonGroup();
-        group.add(radioButton1);
-        group.add(radioButton2);
-        panelSexo.add(radioButton1);
-        panelSexo.add(radioButton2);
-        this.add(panelSexo, gbc);
 
         gbc.gridx = 3;
         JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -409,16 +408,100 @@ public class Formulario extends JPanel
         contenedor6.add(scrollPane4);
         this.add(contenedor6, gbc);
         
+        cve.addKeyListener(new KeyAdapter(){
+           @Override
+            public void keyTyped(KeyEvent e) {
+                ctrl.Validaciones.validaAlfanumerico(e, 15, cve.getText());
+                //char c = e.getKeyChar();
+                //System.out.println("Tecla Typed: " + c);
+            } 
+            
+           @Override
+            public void keyPressed(KeyEvent e) {
+                enterKeyPressed(e, cve.getText(), nombre);
+            } 
+        });
         nombre.addKeyListener(new KeyAdapter(){
            @Override
             public void keyTyped(KeyEvent e) {
-                ctrl.Validaciones.validaAlfabeticos(e, 15, nombre.getText());
-                char c = e.getKeyChar();
-                System.out.println("Tecla Typed: " + c);
+                ctrl.Validaciones.validaAlfabeticos(e, 30, nombre.getText());
             } 
+            
+            @Override
+            public void keyPressed(KeyEvent e) {
+                enterKeyPressed(e, nombre.getText(), primerAp);
+            }
+        });
+        primerAp.addKeyListener(new KeyAdapter(){
+           @Override
+            public void keyTyped(KeyEvent e) {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, primerAp.getText());
+            }
+            @Override
+            public void keyPressed(KeyEvent e) {
+                enterKeyPressed(e, primerAp.getText(), segundoAp);
+            }
+        });
+        segundoAp.addKeyListener(new KeyAdapter(){
+           @Override
+            public void keyTyped(KeyEvent e) {
+                
+                ctrl.Validaciones.validaAlfabeticos(e, 30, segundoAp.getText());
+            } 
+            @Override
+            public void keyPressed(KeyEvent e) {
+                enterKeyPressed(e, segundoAp.getText(), radioButton1);
+            }
+        });
+        
+//        radioButton1.addKeyListener(new KeyListener() {
+//            @Override
+//            public void keyTyped(KeyEvent e) {
+//            }
+//
+//            @Override
+//            public void keyPressed(KeyEvent e) {
+//                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+//                    if (radioButton1.isSelected()) {
+//                        enterKeyPressed(e, radioButton1.getText(), estatus);
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void keyReleased(KeyEvent e) {
+//            }
+//            
+//        });
+        
+        radioButton1.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    if (radioButton1.isSelected()) {
+                        // Ejecutar la acción cuando el JRadioButton está seleccionado y se presiona "Enter"
+                        System.out.println("Radio Button Seleccionado y Enter Presionado");
+                    }
+                }
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
         });
     }
     
+    private void enterKeyPressed(KeyEvent e, String s, Object obj)
+    {
+        
+        if(!s.isEmpty())
+        {
+            ctrl.Validaciones.enter(this , e, obj); 
+        }
+    }
     public void habilitarComponentes(boolean enable)
     {
         cve.setEnabled(false);

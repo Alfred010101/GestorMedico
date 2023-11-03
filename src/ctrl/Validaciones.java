@@ -6,8 +6,11 @@
 package ctrl;
 
 import java.awt.event.KeyEvent;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
@@ -229,7 +232,7 @@ public class Validaciones
             ke.consume();
         } else
         {
-            van(ke);
+            validarNombres(ke, s);
         }
     }
 
@@ -243,7 +246,7 @@ public class Validaciones
      */
     public static void validaAlfanumerico(KeyEvent ke)
     {
-        van(ke);
+        validarCve(ke);
     }
 
     /**
@@ -265,7 +268,7 @@ public class Validaciones
             ke.consume();
         } else
         {
-            van(ke);
+            validarCve(ke);
         }
     }
 
@@ -319,7 +322,7 @@ public class Validaciones
      * @param ke Variable evt del método KeyPress
      * @param obj Objeto al que se desea pasar al momento de dar enter
      */
-    public static void enter(JFrame jf, KeyEvent ke, Object obj)
+    public static void enter(JPanel jf, KeyEvent ke, Object obj)
     {
         if (ke.getKeyChar() == '\n')
         {
@@ -519,7 +522,7 @@ public class Validaciones
      */
     public static void enterEntero(JDialog jd, KeyEvent ke,
             JTextField jt, Object obj)
-    
+
     {
         if (ke.getKeyChar() == '\n')
         {
@@ -592,6 +595,43 @@ public class Validaciones
                 && ke.getKeyChar() != 'Ú')
         {
             ke.setKeyChar((char) 8);
+        } else
+        {
+            char c = ke.getKeyChar();
+            if (Character.isLowerCase(c))
+            {
+                ke.setKeyChar(Character.toUpperCase(c));
+            }
+        }
+    }
+
+    private static void validarNombres(KeyEvent ke, String s)
+    {
+        if ((ke.getKeyChar() < 'a' || ke.getKeyChar() > 'z')
+                && (ke.getKeyChar() < 'A' || ke.getKeyChar() > 'Z')
+                && ke.getKeyCode() != 8   && ke.getKeyChar() != ' ' 
+                && ke.getKeyChar() != 'ñ' && ke.getKeyChar() != 'Ñ' 
+                && ke.getKeyChar() != 'á' && ke.getKeyChar() != 'Á' 
+                && ke.getKeyChar() != 'é' && ke.getKeyChar() != 'É' 
+                && ke.getKeyChar() != 'í' && ke.getKeyChar() != 'Í' 
+                && ke.getKeyChar() != 'ó' && ke.getKeyChar() != 'Ó' 
+                && ke.getKeyChar() != 'ú' && ke.getKeyChar() != 'Ú')
+        {
+            ke.setKeyChar((char) 8);
+        } else
+        {
+            if ((!s.isEmpty() && s.charAt(s.length()-1) == ' ' && ke.getKeyChar() == ' ') 
+                    || (s.isEmpty() && ke.getKeyChar() == ' '))
+            {
+                ke.setKeyChar((char) 8);
+            } else
+            {
+                if (Character.isLowerCase(ke.getKeyChar()))
+                {
+                    ke.setKeyChar(Character.toUpperCase(ke.getKeyChar()));
+                }
+            }
+
         }
     }
 
@@ -600,13 +640,12 @@ public class Validaciones
      *
      * @param ke
      */
-    private static void van(KeyEvent ke)
+    private static void validarCve(KeyEvent ke)
     {
         if ((ke.getKeyChar() < 'a' || ke.getKeyChar() > 'z')
                 && (ke.getKeyChar() < 'A' || ke.getKeyChar() > 'Z')
                 && (ke.getKeyChar() < '0' || ke.getKeyChar() > '9')
-                && ke.getKeyCode() != 8 && ke.getKeyChar() != '.'
-                && ke.getKeyChar() != ' ' && ke.getKeyChar() != 'ñ'
+                && ke.getKeyCode() != 8 && ke.getKeyChar() != 'ñ'
                 && ke.getKeyChar() != 'Ñ' && ke.getKeyChar() != 'á'
                 && ke.getKeyChar() != 'Á' && ke.getKeyChar() != 'é'
                 && ke.getKeyChar() != 'É' && ke.getKeyChar() != 'í'
@@ -615,8 +654,38 @@ public class Validaciones
                 && ke.getKeyChar() != 'Ú')
         {
             ke.setKeyChar((char) 8);
+        } else
+        {
+            char c = ke.getKeyChar();
+            if (Character.isLowerCase(c))
+            {
+                ke.setKeyChar(Character.toUpperCase(c));
+            }
         }
     }
+//    private static void van(KeyEvent ke)
+//    {
+//        if ((ke.getKeyChar() < 'a' || ke.getKeyChar() > 'z')
+//                && (ke.getKeyChar() < 'A' || ke.getKeyChar() > 'Z')
+//                && (ke.getKeyChar() < '0' || ke.getKeyChar() > '9')
+//                && ke.getKeyCode() != 8 &&  ke.getKeyChar() != 'ñ'
+//                && ke.getKeyChar() != 'Ñ' && ke.getKeyChar() != 'á'
+//                && ke.getKeyChar() != 'Á' && ke.getKeyChar() != 'é'
+//                && ke.getKeyChar() != 'É' && ke.getKeyChar() != 'í'
+//                && ke.getKeyChar() != 'Í' && ke.getKeyChar() != 'ó'
+//                && ke.getKeyChar() != 'Ó' && ke.getKeyChar() != 'ú'
+//                && ke.getKeyChar() != 'Ú')
+//        {
+//            ke.setKeyChar((char) 8);
+//        }else
+//        {
+//            char c = ke.getKeyChar();
+//            if (Character.isLowerCase(c))
+//            {
+//                ke.setKeyChar(Character.toUpperCase(c));
+//            }
+//        }
+//    }
 
     /**
      * Método que se coloca en el evento KeyPress de una caja de texto con el
@@ -625,7 +694,8 @@ public class Validaciones
      *
      * @param evt Variable evt del método KeyPress
      * @param jf frame donde se desplegará el mensaje de error
-     * @param jt caja de texto que sera limpiada para evitar pegar cortar o copiar inf
+     * @param jt caja de texto que sera limpiada para evitar pegar cortar o
+     * copiar inf
      */
     public static void validaCopyPaste(KeyEvent evt, JFrame jf, JTextField jt)
     {
@@ -633,26 +703,26 @@ public class Validaciones
         {
             System.out.println("xxxxxxxxx");
             jt.setText("");
-            evt.setKeyChar((char)8);
+            evt.setKeyChar((char) 8);
             evt.setKeyCode(0);
             Mensajes.error(jf, "comando desactivado");
         } else if (evt.isControlDown() && evt.getKeyCode() == KeyEvent.VK_X)
         {
-             jt.setText("");
-             evt.setKeyChar((char)8);
-             evt.setKeyCode(0);
+            jt.setText("");
+            evt.setKeyChar((char) 8);
+            evt.setKeyCode(0);
             Mensajes.error(jf, "comando desactivado");
         } else if (evt.isControlDown() && evt.getKeyCode() == KeyEvent.VK_V)
         {
             System.out.println("xxxxxxxxx");
-             jt.setText("");
-            evt.setKeyChar((char)8);
+            jt.setText("");
+            evt.setKeyChar((char) 8);
             evt.setKeyCode(0);
             Mensajes.error(jf, "comando desactivado");
-            
+
         }
     }
-    
+
     /**
      * Método que se coloca en el evento KeyPress de una caja de texto con el
      * fin de validar si la tecla presioanada es ENTER siempre y cuando el
@@ -681,6 +751,7 @@ public class Validaciones
         }
         return false;
     }
+
     /**
      * Método que se coloca en el evento KeyPress de una caja de texto con el
      * fin de validar si la tecla presioanada es ENTER siempre y cuando el
@@ -709,6 +780,7 @@ public class Validaciones
         }
         return false;
     }
+
     /**
      * Método que se coloca en el evento KeyPress de una caja de texto con el
      * fin de validar si la tecla presioanada es ENTER siempre y cuando el
@@ -737,6 +809,7 @@ public class Validaciones
         }
         return false;
     }
+
     /**
      * Método que se coloca en el evento KeyPress de una caja de texto con el
      * fin de validar si la tecla presioanada es ENTER siempre y cuando el
