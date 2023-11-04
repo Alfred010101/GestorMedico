@@ -10,6 +10,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -17,6 +19,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -35,7 +38,7 @@ public class Formulario extends JPanel
     private JTextField nombre;
     private JTextField primerAp;
     private JTextField segundoAp;
-    private char sexo;
+    //private char sexo;
     private JCheckBox desnutricion;
     private JCheckBox sobrepeso;
     private JCheckBox alergias;
@@ -108,11 +111,27 @@ public class Formulario extends JPanel
     }
 
     /**
-     * @return the sexo
+     * @return the radioButton1
      */
-    public char getSexo()
+    public JRadioButton getRadioButton1()
     {
-        return sexo;
+        return radioButton1;
+    }
+
+    /**
+     * @return the radioButton2
+     */
+    public JRadioButton getRadioButton2()
+    {
+        return radioButton2;
+    }
+
+    /**
+     * @return the type
+     */
+    public boolean isType()
+    {
+        return type;
     }
 
     /**
@@ -265,16 +284,15 @@ public class Formulario extends JPanel
         nombre = new JTextField(18);
         primerAp = new JTextField(18);
         segundoAp = new JTextField(18);
-        sexo = 'H';
         desnutricion = new JCheckBox("Desnutricion");
         sobrepeso = new JCheckBox("Sobrepeso");
         alergias = new JCheckBox("Alergias");
         obesidad = new JCheckBox("Obesidad");
         diabetes = new JCheckBox("Diabetes");
-        otras = new JCheckBox("Otras");
+        otras = new JCheckBox("Otro");
         otrasCual = new JTextField(18);
         otrasCual.setEnabled(false);
-        
+
         padecimientoActual = new JCheckBox("Padecimineto Actual");
         padecimientoCual = new JTextArea(7, 35);
         padecimientoCual.setEnabled(false);
@@ -531,14 +549,14 @@ public class Formulario extends JPanel
             {
                 ctrl.Validaciones.validarFecha(e, fecha.getText(), 10);
             }
-            
+
             @Override
             public void keyPressed(KeyEvent e)
             {
                 enterKeyPressed(e, fecha.getText(), desnutricion);
             }
         });
-        
+
         otras.addItemListener(new ItemListener()
         {
             @Override
@@ -549,6 +567,12 @@ public class Formulario extends JPanel
         });
         otrasCual.addKeyListener(new KeyAdapter()
         {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.vanTxt(e);
+            }
+            
             @Override
             public void keyPressed(KeyEvent e)
             {
@@ -595,6 +619,100 @@ public class Formulario extends JPanel
         {
             ctrl.Validaciones.enter(this, e, obj);
         }
+    }
+
+    public boolean validarFormulario()
+    {
+        if (!ctrl.Validaciones.validarInputCve(this.getCve().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "La clave no es valida \n verifique y vuelva a intentar");
+            return false;
+        }
+        if (!ctrl.Validaciones.validarInputNombre(this.getNombre().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "El nombre no es valido \n verifique y vuelva a intentar");
+            return false;
+        }
+        if (!ctrl.Validaciones.validarInputNombre(this.getPrimerAp().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "El apellido paterno no es valido \n verifique y vuelva a intentar");
+            return false;
+        }
+        if (!ctrl.Validaciones.validarInputNombre(this.getSegundoAp().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "El apellido materno no es valido \n verifique y vuelva a intentar");
+            return false;
+        }
+        if (!this.getRadioButton1().isSelected() && !this.getRadioButton2().isSelected())
+        {
+            JOptionPane.showMessageDialog(null, "Debe asignar un sexo para continuar");
+            return false;
+        }
+        if (this.isType() && this.getEstatus().getSelectedIndex() == 0)
+        {
+            JOptionPane.showMessageDialog(null, "Debe asignar un estatus al personal para continuar");
+            return false;
+        } else
+        {
+            if (this.getEstatus().getSelectedIndex() == 0)
+            {
+                JOptionPane.showMessageDialog(null, "Debe indicar con quien vive el estudiante para continuar");
+                return false;
+            }
+        }
+        if (!this.isType() && this.getCarrera().getSelectedIndex() == 0)
+        {
+            JOptionPane.showMessageDialog(null, "Debe indicar la carrera del estudiante para continuar");
+            return false;
+        }
+
+        Date fecha;
+        SimpleDateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy");
+        formato1.setLenient(false);
+        formato2.setLenient(false);
+
+        try
+        {
+            fecha = formato1.parse(this.getFecha().getText());
+        } catch (ParseException ex1)
+        {
+            try
+            {
+                fecha = formato2.parse(this.getFecha().getText());
+            } catch (ParseException ex2)
+            {
+                JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto");
+                return false;
+            }
+        }
+        
+        if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto");
+            return false;
+        }
+        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto actual");
+            return false;
+        }
+        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el plan de tratamiento");
+            return false;
+        }
+        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el medicamento");
+            return false;
+        }
+        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar los antecedentes");
+            return false;
+        }
+        return true;
     }
 
     public void habilitarComponentes(boolean enable)

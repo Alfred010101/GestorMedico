@@ -663,29 +663,43 @@ public class Validaciones
             }
         }
     }
-//    private static void van(KeyEvent ke)
-//    {
-//        if ((ke.getKeyChar() < 'a' || ke.getKeyChar() > 'z')
-//                && (ke.getKeyChar() < 'A' || ke.getKeyChar() > 'Z')
-//                && (ke.getKeyChar() < '0' || ke.getKeyChar() > '9')
-//                && ke.getKeyCode() != 8 &&  ke.getKeyChar() != 'ñ'
-//                && ke.getKeyChar() != 'Ñ' && ke.getKeyChar() != 'á'
-//                && ke.getKeyChar() != 'Á' && ke.getKeyChar() != 'é'
-//                && ke.getKeyChar() != 'É' && ke.getKeyChar() != 'í'
-//                && ke.getKeyChar() != 'Í' && ke.getKeyChar() != 'ó'
-//                && ke.getKeyChar() != 'Ó' && ke.getKeyChar() != 'ú'
-//                && ke.getKeyChar() != 'Ú')
-//        {
-//            ke.setKeyChar((char) 8);
-//        }else
-//        {
-//            char c = ke.getKeyChar();
-//            if (Character.isLowerCase(c))
-//            {
-//                ke.setKeyChar(Character.toUpperCase(c));
-//            }
-//        }
-//    }
+    
+    private static boolean validarAlfabeto(char ke)
+    {
+        if ((ke < 'a' || ke > 'z')
+                && (ke < 'A' || ke > 'Z')
+                && ke != 8 && ke != 'ñ'
+                && ke != 'Ñ' && ke != 'á'
+                && ke != 'Á' && ke != 'é'
+                && ke != 'É' && ke != 'í'
+                && ke != 'Í' && ke != 'ó'
+                && ke != 'Ó' && ke != 'ú'
+                && ke != 'Ú')
+        {
+           return false;
+        } else
+        {
+            return true;
+        }
+    }
+    
+    public static void vanTxt(KeyEvent ke)
+    {
+        if ((ke.getKeyChar() < 'a' || ke.getKeyChar() > 'z')
+                && (ke.getKeyChar() < 'A' || ke.getKeyChar() > 'Z')
+                && (ke.getKeyChar() < '0' || ke.getKeyChar() > '9')
+                && ke.getKeyCode() != 8 &&  ke.getKeyChar() != 'ñ'
+                && ke.getKeyChar() != 'Ñ' && ke.getKeyChar() != 'á'
+                && ke.getKeyChar() != 'Á' && ke.getKeyChar() != 'é'
+                && ke.getKeyChar() != 'É' && ke.getKeyChar() != 'í'
+                && ke.getKeyChar() != 'Í' && ke.getKeyChar() != 'ó'
+                && ke.getKeyChar() != 'Ó' && ke.getKeyChar() != 'ú'
+                && ke.getKeyChar() != 'Ú' && ke.getKeyChar() != '.' 
+                && ke.getKeyChar() != ' ' )
+        {
+            ke.setKeyChar((char) 8);
+        }
+    }
 
     /**
      * Método que se coloca en el evento KeyPress de una caja de texto con el
@@ -856,6 +870,11 @@ public class Validaciones
         }
     }
     
+    public static boolean validarFecha(String s)
+    {
+        return getPriNum(s);
+    }
+    
     public static int contCaracter(String s, char c)
     {
         int cont = 0;
@@ -871,5 +890,121 @@ public class Validaciones
             }
         }
         return cont;
+    }
+    
+    private static boolean getPriNum(String s)
+    {
+        if(s.isEmpty())
+        {
+            return false;
+        }
+        int i = 0;
+        for ( ; i < s.length(); i++)
+        {
+            if(!validarNumero(s.charAt(i)))
+            {
+                break;
+            }
+        }
+        if(i > 0 && i < 3 && s.length() > 7 && s.length() < 11)
+        {
+            try
+            {
+                int num = Integer.parseInt(s.substring(0,i));
+                if(num > 0 && num < 32)
+                {
+                    return getSegNum(s.substring(i+1));
+                }
+            } catch (NumberFormatException e)
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    private static boolean getSegNum(String s)
+    {        
+        if(s.isEmpty())
+        {
+            return false;
+        }
+        if(s.length() > 5 && s.length() < 8)
+        {
+            try
+            {
+                int num = Integer.parseInt(s.substring(0, (s.length() == 7)?2:1));
+                if(num > 0 && num < 13)
+                {
+                    return getTerNum(s.substring((s.length() == 7) ? 3 : 2));
+                }
+            } catch (NumberFormatException e)
+            {                
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    private static boolean getTerNum(String s)
+    {      
+        if(s.isEmpty())
+        {
+            return false;
+        }
+        if(s.length() == 4)
+        {
+            try
+            {
+                int num = Integer.parseInt(s);
+                if(num > 1900 && num < 2200)
+                {
+                    return true;
+                }
+            } catch (NumberFormatException e)
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+    
+    private static boolean validarNumero(char c)
+    {
+        return (c >= '0' && c <= '9');
+    }
+    
+    public static boolean validarInputCve(String s)
+    {
+        if(s.length() > 15 || s.isEmpty())
+        {
+            return false;
+        }
+        
+        for (int i = 0; i < s.length(); i++)
+        {
+            if(!validarAlfabeto(s.charAt(i)) && !validarNumero(s.charAt(i)))
+            {
+                return false;
+            }            
+        }
+        return true;
+    }
+    
+    public static boolean validarInputNombre(String s)
+    {
+        if(s.isEmpty())
+        {
+            return false;
+        }
+        String cadena = s.trim().replaceAll("\\s+", " ");
+        for (int i = 0; i < cadena.length(); i++)
+        {
+            if(!validarAlfabeto(cadena.charAt(i)) && cadena.charAt(i) != ' ')
+            {
+                return false;
+            }            
+        }
+        return true;
     }
 }
