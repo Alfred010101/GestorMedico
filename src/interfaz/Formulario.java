@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -587,12 +588,40 @@ public class Formulario extends JPanel
                 ctrl.CtrlInterfaz.itemStateChanged(padecimientoCual, e);
             }
         });
+        padecimientoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(padecimientoActual);
+                        //System.out.println("Shift + TAB presionado");
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(planTratamiento);
+                        //System.out.println("TAB presionado");
+                    }
+                }
+            }
+        });
         planTratamiento.addItemListener(new ItemListener()
         {
             @Override
             public void itemStateChanged(ItemEvent e)
             {
                 ctrl.CtrlInterfaz.itemStateChanged(planTratamientoCual, e);
+            }
+        });
+        planTratamientoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(planTratamiento);                        
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(medicamento);
+                    }
+                }
             }
         });
         medicamento.addItemListener(new ItemListener()
@@ -603,12 +632,40 @@ public class Formulario extends JPanel
                 ctrl.CtrlInterfaz.itemStateChanged(medicamentoCual, e);
             }
         });
+        medicamentoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(medicamento);                        
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(antecedentes);
+                    }
+                }
+            }
+        });
         antecedentes.addItemListener(new ItemListener()
         {
             @Override
             public void itemStateChanged(ItemEvent e)
             {
                 ctrl.CtrlInterfaz.itemStateChanged(antecedentesCual, e);
+            }
+        });
+        antecedentesCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusPreviousComponent();
+                        //ctrl.CtrlInterfaz.cambia(antecedentes);                        
+                    } else {
+                        e.consume();
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
+                        //ctrl.CtrlInterfaz.cambia(btnCan);
+                    }
+                }
             }
         });
     }
@@ -625,25 +682,29 @@ public class Formulario extends JPanel
     {
         if (!ctrl.Validaciones.validarInputCve(this.getCve().getText()))
         {
-            JOptionPane.showMessageDialog(null, "La clave no es valida \n verifique y vuelva a intentar");
+            JOptionPane.showMessageDialog(null, "La clave no es valida, verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(cve);
             return false;
         }
         if (!ctrl.Validaciones.validarInputNombre(this.getNombre().getText()))
         {
-            JOptionPane.showMessageDialog(null, "El nombre no es valido \n verifique y vuelva a intentar");
+            JOptionPane.showMessageDialog(null, "El nombre no es valido,  verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(nombre);
             return false;
         }
         if (!ctrl.Validaciones.validarInputNombre(this.getPrimerAp().getText()))
         {
-            JOptionPane.showMessageDialog(null, "El apellido paterno no es valido \n verifique y vuelva a intentar");
+            JOptionPane.showMessageDialog(null, "El apellido paterno no es valido, verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(primerAp);
             return false;
         }
         if (!ctrl.Validaciones.validarInputNombre(this.getSegundoAp().getText()))
         {
-            JOptionPane.showMessageDialog(null, "El apellido materno no es valido \n verifique y vuelva a intentar");
+            JOptionPane.showMessageDialog(null, "El apellido materno no es valido, verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(segundoAp);
             return false;
         }
-        if (!this.getRadioButton1().isSelected() && !this.getRadioButton2().isSelected())
+        /*if (!this.getRadioButton1().isSelected() && !this.getRadioButton2().isSelected())
         {
             JOptionPane.showMessageDialog(null, "Debe asignar un sexo para continuar");
             return false;
@@ -664,7 +725,7 @@ public class Formulario extends JPanel
         {
             JOptionPane.showMessageDialog(null, "Debe indicar la carrera del estudiante para continuar");
             return false;
-        }
+        }*/
 
         Date fecha;
         SimpleDateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
@@ -683,36 +744,114 @@ public class Formulario extends JPanel
             } catch (ParseException ex2)
             {
                 JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto");
+                ctrl.CtrlInterfaz.selecciona(this.fecha);
                 return false;
             }
         }
         
-        if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
+        /*if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
         {
             JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto");
             return false;
         }
-        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().isEmpty())
+        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().trim().isEmpty())
         {
             JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto actual");
             return false;
         }
-        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().isEmpty())
+        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().trim().isEmpty())
         {
             JOptionPane.showMessageDialog(null, "Debe especifacar el plan de tratamiento");
             return false;
         }
-        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().isEmpty())
+        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().trim().isEmpty())
         {
             JOptionPane.showMessageDialog(null, "Debe especifacar el medicamento");
             return false;
         }
-        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().isEmpty())
+        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().trim().isEmpty())
         {
             JOptionPane.showMessageDialog(null, "Debe especifacar los antecedentes");
             return false;
-        }
+        }*/
         return true;
+    }
+    
+    public boolean camposVacios()
+    {
+        if (this.getCve().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(cve);
+            return true;
+        }
+        if (this.getNombre().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(nombre);
+            return true;
+        }
+        if (this.getPrimerAp().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(primerAp);
+            return true;
+        }
+        if (this.getSegundoAp().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(segundoAp);
+            return true;
+        }
+        if (!this.getRadioButton1().isSelected() && !this.getRadioButton2().isSelected())
+        {
+            ctrl.CtrlInterfaz.cambia(radioButton1);
+            return true;
+        }
+        if (this.isType() && this.getEstatus().getSelectedIndex() == 0)
+        {
+            ctrl.CtrlInterfaz.cambia(estatus);
+            return true;
+        } else
+        {
+            if (this.getEstatus().getSelectedIndex() == 0)
+            {
+                ctrl.CtrlInterfaz.cambia(estatus);
+                return true;
+            }
+        }
+        if (!this.isType() && this.getCarrera().getSelectedIndex() == 0)
+        {
+            ctrl.CtrlInterfaz.cambia(carrera);
+            return true;
+        }
+        if(this.getFecha().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(fecha);
+            return true;
+        }
+        if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(otrasCual);
+            return true;
+        }
+        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(padecimientoCual);
+            return true;
+        }
+        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(planTratamientoCual);
+            return true;
+        }
+        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(medicamentoCual);
+            return true;
+        }
+        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(antecedentesCual);
+            return true;
+        }
+        return false;
     }
 
     public void habilitarComponentes(boolean enable)

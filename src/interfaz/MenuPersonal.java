@@ -161,10 +161,17 @@ public class MenuPersonal extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                if(formulario.validarFormulario())
+                if (formulario.camposVacios())
                 {
-                    JOptionPane.showMessageDialog(null, "Registro exitoso");
+                    JOptionPane.showMessageDialog(null, "Todos los campos requeridos deben ser llenados, verifique si a activado algun checkbox que requiera mas informacion este no puede quedar vacio");
+                } else
+                {
+                    if (formulario.validarFormulario())
+                    {
+                        JOptionPane.showMessageDialog(null, "Registro exitoso");
+                    }
                 }
+
             }
         }
         );
