@@ -5,17 +5,24 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
@@ -69,7 +76,7 @@ public class VentanaPrincipal extends JFrame
 
         menuActivo = Menu.INICIO;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setResizable(false);
+        //this.setResizable(false);
         this.setUndecorated(true);
         this.add(panelPrincipal);
         this.setSize(1200, 700);
@@ -258,6 +265,63 @@ public class VentanaPrincipal extends JFrame
         panelWest.add(Box.createVerticalGlue());
         panelWest.add(opcMenu[4]);
 
+        KeyStroke keyInicio = KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyPersonal = KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyEstudiantes = KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyBuscar = KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyAyuda = KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0);
+
+        Action actionInicio = new AbstractAction("Inicio")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                activarMenu(Menu.INICIO);
+            }
+        };
+        Action actionPersonal = new AbstractAction("Personal")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                activarMenu(Menu.PERSONAL);
+            }
+        };
+        Action actionEstudiantes = new AbstractAction("Estudiantes")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                activarMenu(Menu.ESTUDIANTES);
+            }
+        };
+        Action actionBuscar = new AbstractAction("Buscar")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                activarMenu(Menu.BUSCAR);
+            }
+        };
+        Action actionAyuda = new AbstractAction("Ayuda")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                activarAyuda();
+            }
+        };
+        opcMenu[Menu.INICIO.ordinal()].getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyInicio, "Inicio");
+        opcMenu[Menu.INICIO.ordinal()].getActionMap().put("Inicio", actionInicio);
+        opcMenu[Menu.PERSONAL.ordinal()].getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyPersonal, "Personal");
+        opcMenu[Menu.PERSONAL.ordinal()].getActionMap().put("Personal", actionPersonal);
+        opcMenu[Menu.ESTUDIANTES.ordinal()].getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyEstudiantes, "Estudiantes");
+        opcMenu[Menu.ESTUDIANTES.ordinal()].getActionMap().put("Estudiantes", actionEstudiantes);
+        opcMenu[Menu.BUSCAR.ordinal()].getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyBuscar, "Buscar");
+        opcMenu[Menu.BUSCAR.ordinal()].getActionMap().put("Buscar", actionBuscar);
+        opcMenu[Menu.AYUDA.ordinal()].getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyAyuda, "Ayuda");
+        opcMenu[Menu.AYUDA.ordinal()].getActionMap().put("Ayuda", actionAyuda);
+
         opcMenu[Menu.INICIO.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
@@ -384,16 +448,7 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mousePressed(MouseEvent evt)
             {
-                try
-                {
-                    String rutaRelativa = "src/Manual/C_+_+.pdf";
-                    File archivo = new File(rutaRelativa);
-                    URI uri = archivo.toURI();
-                    Desktop.getDesktop().browse(uri);
-                } catch (IOException e)
-                {
-                }
-
+                activarAyuda();
             }
         });
     }
@@ -422,6 +477,19 @@ public class VentanaPrincipal extends JFrame
             opcMenu[menuIr.ordinal()].setIcon(new ImageIcon(pathImagenes + imgMenuActivo[menuIr.ordinal()]));
             menuActivo = menuIr;
             cardLayout.show(panelCenter, "Panel " + menuActivo.ordinal());
+        }
+    }
+
+    private void activarAyuda()
+    {
+        try
+        {
+            String rutaRelativa = "src/Manual/C_+_+.pdf";
+            File archivo = new File(rutaRelativa);
+            URI uri = archivo.toURI();
+            Desktop.getDesktop().browse(uri);
+        } catch (IOException e)
+        {
         }
     }
 }

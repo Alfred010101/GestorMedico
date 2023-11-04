@@ -10,9 +10,17 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,6 +29,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -35,7 +44,7 @@ public class MenuPersonal extends JPanel
 
     private JPanel panelHerramientas;
     private JPanel panelAreaTrabajo;
-    private JTabbedPane tabbedPane = new JTabbedPane();
+    private JTabbedPane tabbedPane;
     final String pathImagenes = "src/interfaz/imagenes/";
 
     public MenuPersonal()
@@ -55,106 +64,154 @@ public class MenuPersonal extends JPanel
     {
         panelHerramientas = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelHerramientas.setBackground(new Color(174, 214, 241));
-        
+
         JLabel guardar = new JLabel(new ImageIcon(pathImagenes + "guardar.png"));
         guardar.setBorder(new EmptyBorder(0, 5, 0, 5));
         guardar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        guardar.setToolTipText("Guardar");               
-        
+        guardar.setToolTipText("Guardar");
+
         JLabel limpiar = new JLabel(new ImageIcon(pathImagenes + "limpiar.png"));
         limpiar.setBorder(new EmptyBorder(0, 5, 0, 5));
         limpiar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        limpiar.setToolTipText("Limpiar"); 
-        
-        
+        limpiar.setToolTipText("Limpiar");
+
         panelHerramientas.add(guardar);
         panelHerramientas.add(limpiar);
     }
-    
+
     private void initPanelSouth()
     {
+        tabbedPane = new JTabbedPane();
         panelAreaTrabajo = new JPanel();
         panelAreaTrabajo.setBackground(Color.WHITE);
         panelAreaTrabajo.setBorder(new EmptyBorder(20, 0, 0, 0));
         panelAreaTrabajo.setLayout(new BorderLayout());
         //panelAreaTrabajo.setLayout(new FlowLayout());
-        
+
         initPanelRegistrar();
         initPanelConsultar();
         initPanelModificar();
-        
-        tabbedPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
+
+        tabbedPane.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent e)
+            {
                 int selectedIndex = tabbedPane.getSelectedIndex();
                 //JOptionPane.showMessageDialog(null, "Se cambió a la pestaña " + selectedIndex);
             }
         });
+
+        KeyStroke keyCtrl1 = KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyCtrl2 = KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK);
+        KeyStroke keyCtrl3 = KeyStroke.getKeyStroke(KeyEvent.VK_3, KeyEvent.CTRL_DOWN_MASK);
+
+        Action actionCtrl1 = new AbstractAction("Pestaña_1")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                tabbedPane.setSelectedIndex(0);
+            }
+        };
+        Action actionCtrl2 = new AbstractAction("Pestaña_2")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                tabbedPane.setSelectedIndex(1);
+            }
+        };
+        Action actionCtrl3 = new AbstractAction("Pestaña_3")
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                tabbedPane.setSelectedIndex(2);
+            }
+        };
+
+        tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCtrl1, "Pestaña_1");
+        tabbedPane.getActionMap().put("Pestaña_1", actionCtrl1);
+        tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCtrl2, "Pestaña_2");
+        tabbedPane.getActionMap().put("Pestaña_2", actionCtrl2);
+        tabbedPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCtrl3, "Pestaña_3");
+        tabbedPane.getActionMap().put("Pestaña_3", actionCtrl3);
+
         panelAreaTrabajo.add(tabbedPane, BorderLayout.CENTER);
     }
-    
+
     private void initPanelRegistrar()
     {
         JPanel contenedor = new JPanel();
         Formulario formulario = new Formulario(true);
         JPanel contenedor2 = new JPanel();
-        
+
         JButton btnCancelar = new JButton("Cancelar");
         contenedor2.add(btnCancelar);
         JButton btnGuardar = new JButton("Guardar");
         contenedor2.add(btnGuardar);
-        
-        contenedor.setLayout(new BoxLayout(contenedor,BoxLayout.Y_AXIS));
+
+        contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
         contenedor.add(formulario);
         contenedor.add(contenedor2);
         tabbedPane.addTab("Registrar", null, contenedor);
-        
+
         btnGuardar.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-               if(formulario.getNombre().getText().equalsIgnoreCase(""))
-               {
-                   formulario.getNombre().setText("Bienvenido");
-               }else
-               {
-                   JOptionPane.showMessageDialog(null, formulario.getNombre().getText());
-               }
+                if (formulario.camposVacios())
+                {
+                    JOptionPane.showMessageDialog(null, "Todos los campos requeridos deben ser llenados, verifique si a activado algun checkbox que requiera mas informacion este no puede quedar vacio");
+                } else
+                {
+                    if (formulario.validarFormulario())
+                    {
+                        JOptionPane.showMessageDialog(null, "Registro exitoso");
+                    }
+                }
+
             }
-            
-        });
+        }
+        );
     }
-    
+
     private void initPanelConsultar()
     {
         JPanel contenedor = new JPanel(new BorderLayout());
-        
-        Object[][] data = {
+
+        Object[][] data =
+        {
 //                {"John", 25, "Engineer"},
 //                {"Alice", 30, "Doctor"},
 //                {"Bob", 28, "Teacher"},
-                {"Clave","Nombre", "Primer A", "Segundo A", "Estatus", "Sexo", "Fecha", "Desnutricion", "Sobrepeso", "Alergias", "Obesida","Diabetes", "Otra", "Padecimineto Actual", "Plan de tratamineto", "Medicamneto", "Antecedentes","Antecedentes","Antecedentes", "Antecedentes"}
+            {
+                "Clave", "Nombre", "Primer A", "Segundo A", "Estatus", "Sexo", "Fecha", "Desnutricion", "Sobrepeso", "Alergias", "Obesida", "Diabetes", "Otra", "Padecimineto Actual", "Plan de tratamineto", "Medicamneto", "Antecedentes", "Antecedentes", "Antecedentes", "Antecedentes"
+            }
         };
 
         // Nombres de las columnas
-        String[] columnNames = {"Clave","Nombre", "Primer A", "Segundo A", "Estatus", "Sexo", "Fecha", "Desnutricion", "Sobrepeso", "Alergias", "Obesida","Diabetes", "Otra", "Padecimineto Actual", "Plan de tratamineto", "Medicamneto", "Antecedentes","Antecedentes","Antecedentes", "Antecedentes"};
+        String[] columnNames =
+        {
+            "Clave", "Nombre", "Primer A", "Segundo A", "Estatus", "Sexo", "Fecha", "Desnutricion", "Sobrepeso", "Alergias", "Obesida", "Diabetes", "Otra", "Padecimineto Actual", "Plan de tratamineto", "Medicamneto", "Antecedentes", "Antecedentes", "Antecedentes", "Antecedentes"
+        };
 
         // Crea una nueva tabla con los datos y nombres de columnas
         JTable table = new JTable(data, columnNames);
-        
+
         // Crea un JScrollPane para agregar la tabla y permitir el desplazamiento si es necesario
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         //table.setPreferredScrollableViewportSize(new Dimension(contenedor.getSize().width, contenedor.getSize().height));
         JScrollPane scrollPane = new JScrollPane(table);
         table.setEnabled(false);
         //scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        
 
         //table.setEnabled(false);
         contenedor.add(scrollPane, BorderLayout.CENTER);
         tabbedPane.addTab("Consultar", null, contenedor);
     }
-    
+
     private void initPanelModificar()
     {
         JPanel conten = new JPanel();
@@ -178,7 +235,7 @@ public class MenuPersonal extends JPanel
         JSeparator separator = new JSeparator(SwingConstants.VERTICAL);
         conten.add(contenedor);
         conten.add(separator);
-        
+
         JPanel contenedor2 = new JPanel();
         JButton btnCancelar = new JButton("Cancelar");
         btnCancelar.setEnabled(false);
@@ -186,14 +243,14 @@ public class MenuPersonal extends JPanel
         JButton btnGuardar = new JButton("Guardar");
         btnGuardar.setEnabled(false);
         contenedor2.add(btnGuardar);
-        
+
         JPanel contenedor3 = new JPanel();
-        contenedor3.setLayout(new BoxLayout(contenedor3,BoxLayout.Y_AXIS));
+        contenedor3.setLayout(new BoxLayout(contenedor3, BoxLayout.Y_AXIS));
         contenedor3.add(formulario);
         contenedor3.add(contenedor2);
         conten.add(contenedor3);
         tabbedPane.addTab("Modificar", null, conten);
-        
+
         btnBuscar.addActionListener(new ActionListener()
         {
             @Override

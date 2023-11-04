@@ -5,14 +5,22 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -31,7 +39,7 @@ public class Formulario extends JPanel
     private JTextField nombre;
     private JTextField primerAp;
     private JTextField segundoAp;
-    private char sexo;
+    //private char sexo;
     private JCheckBox desnutricion;
     private JCheckBox sobrepeso;
     private JCheckBox alergias;
@@ -104,11 +112,27 @@ public class Formulario extends JPanel
     }
 
     /**
-     * @return the sexo
+     * @return the radioButton1
      */
-    public char getSexo()
+    public JRadioButton getRadioButton1()
     {
-        return sexo;
+        return radioButton1;
+    }
+
+    /**
+     * @return the radioButton2
+     */
+    public JRadioButton getRadioButton2()
+    {
+        return radioButton2;
+    }
+
+    /**
+     * @return the type
+     */
+    public boolean isType()
+    {
+        return type;
     }
 
     /**
@@ -261,23 +285,27 @@ public class Formulario extends JPanel
         nombre = new JTextField(18);
         primerAp = new JTextField(18);
         segundoAp = new JTextField(18);
-        sexo = 'H';
         desnutricion = new JCheckBox("Desnutricion");
         sobrepeso = new JCheckBox("Sobrepeso");
         alergias = new JCheckBox("Alergias");
         obesidad = new JCheckBox("Obesidad");
         diabetes = new JCheckBox("Diabetes");
-        otras = new JCheckBox("Otras");
+        otras = new JCheckBox("Otro");
         otrasCual = new JTextField(18);
-        
+        otrasCual.setEnabled(false);
+
         padecimientoActual = new JCheckBox("Padecimineto Actual");
         padecimientoCual = new JTextArea(7, 35);
+        padecimientoCual.setEnabled(false);
         antecedentes = new JCheckBox("Antecedentes");
         antecedentesCual = new JTextArea(7, 35);
+        antecedentesCual.setEnabled(false);
         medicamento = new JCheckBox("Medicamento");
         medicamentoCual = new JTextArea(7, 35);
+        medicamentoCual.setEnabled(false);
         planTratamiento = new JCheckBox("Plan de tratamiento");
         planTratamientoCual = new JTextArea(7, 35);
+        planTratamientoCual.setEnabled(false);
         fecha = new JTextField(6);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -306,40 +334,6 @@ public class Formulario extends JPanel
 
         gbc.gridx = 0;
         gbc.gridy = 2;
-
-        String[] opcEstatus;
-        String[] opcCarrera;
-        if (type)
-        {
-            opcEstatus = new String[]
-            {
-                "","Base", "Temporal"
-            };
-        } else
-        {
-            opcEstatus = new String[]
-            {
-                "","Mamá", "Papá", "Ambos"
-            };
-            opcCarrera = new String[]
-            {
-              "","Carrera 1" , "Carrera 2", "Carrera 3", "Carrera 4"
-            };
-            JPanel contenerdor = new JPanel();
-            carrera = new JComboBox(opcCarrera);
-            contenerdor.add(new JLabel("Carrera"));
-            contenerdor.add(carrera);
-            this.add(contenerdor, gbc);
-            gbc.gridx = 1;            
-        }
-
-        JPanel contenedor2 = new JPanel(new FlowLayout());
-        estatus = new JComboBox(opcEstatus);
-        contenedor2.add(new JLabel((type) ? "Estatus" : "Vive Con"));
-        contenedor2.add(estatus);
-        this.add(contenedor2, gbc);
-
-        gbc.gridx = 2;
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Sexo");
         JPanel panelSexo = new JPanel();
         panelSexo.setBorder(titledBorder);
@@ -351,6 +345,39 @@ public class Formulario extends JPanel
         panelSexo.add(radioButton1);
         panelSexo.add(radioButton2);
         this.add(panelSexo, gbc);
+
+        gbc.gridx = 2;
+        String[] opcEstatus;
+        if (type)
+        {
+            opcEstatus = new String[]
+            {
+                "", "Base", "Temporal"
+            };
+            carrera = new JComboBox(opcEstatus);
+        } else
+        {
+            opcEstatus = new String[]
+            {
+                "", "Mamá", "Papá", "Ambos"
+            };
+            String[] opcCarrera = new String[]
+            {
+                "", "Carrera 1", "Carrera 2", "Carrera 3", "Carrera 4"
+            };
+            JPanel contenerdor = new JPanel();
+            carrera = new JComboBox(opcCarrera);
+            contenerdor.add(new JLabel("Carrera"));
+            contenerdor.add(carrera);
+            this.add(contenerdor, gbc);
+            gbc.gridx = 1;
+        }
+
+        JPanel contenedor2 = new JPanel(new FlowLayout());
+        estatus = new JComboBox(opcEstatus);
+        contenedor2.add(new JLabel((type) ? "Estatus" : "Vive Con"));
+        contenedor2.add(estatus);
+        this.add(contenedor2, gbc);
 
         gbc.gridx = 3;
         JPanel contenedor = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -407,8 +434,426 @@ public class Formulario extends JPanel
         contenedor6.add(planTratamiento);
         contenedor6.add(scrollPane4);
         this.add(contenedor6, gbc);
+
+        cve.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfanumerico(e, 15, cve.getText());
+                //char c = e.getKeyChar();
+                //System.out.println("Tecla Typed: " + c);
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, cve.getText(), nombre);
+            }
+        });
+        nombre.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, nombre.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, nombre.getText(), primerAp);
+            }
+        });
+        primerAp.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, primerAp.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, primerAp.getText(), segundoAp);
+            }
+        });
+        segundoAp.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, segundoAp.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, segundoAp.getText(), radioButton1);
+            }
+        });
+        radioButton1.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && radioButton1.isSelected())
+                {
+                    enterKeyPressed(e, radioButton1.getText(), estatus);
+                }
+            }
+        });
+        radioButton2.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && radioButton2.isSelected())
+                {
+                    enterKeyPressed(e, radioButton2.getText(), estatus);
+                }
+            }
+        });
+        estatus.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && estatus.getSelectedIndex() != 0)
+                {
+                    if (type)
+                    {
+                        enterKeyPressed(e, " ", fecha);
+                    } else
+                    {
+                        enterKeyPressed(e, " ", carrera);
+                    }
+                }
+            }
+        });
+        carrera.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && estatus.getSelectedIndex() != 0)
+                {
+                    enterKeyPressed(e, " ", fecha);
+                }
+            }
+        });
+        fecha.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validarFecha(e, fecha.getText(), 10);
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, fecha.getText(), desnutricion);
+            }
+        });
+
+        otras.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(otrasCual, e);
+            }
+        });
+        otrasCual.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.vanTxt(e);
+            }
+            
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, otrasCual.getText(), padecimientoActual);
+            }
+        });
+        padecimientoActual.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(padecimientoCual, e);
+            }
+        });
+        padecimientoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(padecimientoActual);
+                        //System.out.println("Shift + TAB presionado");
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(planTratamiento);
+                        //System.out.println("TAB presionado");
+                    }
+                }
+            }
+        });
+        planTratamiento.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(planTratamientoCual, e);
+            }
+        });
+        planTratamientoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(planTratamiento);                        
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(medicamento);
+                    }
+                }
+            }
+        });
+        medicamento.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(medicamentoCual, e);
+            }
+        });
+        medicamentoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(medicamento);                        
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(antecedentes);
+                    }
+                }
+            }
+        });
+        antecedentes.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(antecedentesCual, e);
+            }
+        });
+        antecedentesCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusPreviousComponent();
+                        //ctrl.CtrlInterfaz.cambia(antecedentes);                        
+                    } else {
+                        e.consume();
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
+                        //ctrl.CtrlInterfaz.cambia(btnCan);
+                    }
+                }
+            }
+        });
+    }
+
+    private void enterKeyPressed(KeyEvent e, String s, Object obj)
+    {
+        if (!s.isEmpty())
+        {
+            ctrl.Validaciones.enter(this, e, obj);
+        }
+    }
+
+    public boolean validarFormulario()
+    {
+        if (!ctrl.Validaciones.validarInputCve(this.getCve().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "La clave no es valida, verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(cve);
+            return false;
+        }
+        if (!ctrl.Validaciones.validarInputNombre(this.getNombre().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "El nombre no es valido,  verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(nombre);
+            return false;
+        }
+        if (!ctrl.Validaciones.validarInputNombre(this.getPrimerAp().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "El apellido paterno no es valido, verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(primerAp);
+            return false;
+        }
+        if (!ctrl.Validaciones.validarInputNombre(this.getSegundoAp().getText()))
+        {
+            JOptionPane.showMessageDialog(null, "El apellido materno no es valido, verifique y vuelva a intentar");
+            ctrl.CtrlInterfaz.selecciona(segundoAp);
+            return false;
+        }
+        /*if (!this.getRadioButton1().isSelected() && !this.getRadioButton2().isSelected())
+        {
+            JOptionPane.showMessageDialog(null, "Debe asignar un sexo para continuar");
+            return false;
+        }
+        if (this.isType() && this.getEstatus().getSelectedIndex() == 0)
+        {
+            JOptionPane.showMessageDialog(null, "Debe asignar un estatus al personal para continuar");
+            return false;
+        } else
+        {
+            if (this.getEstatus().getSelectedIndex() == 0)
+            {
+                JOptionPane.showMessageDialog(null, "Debe indicar con quien vive el estudiante para continuar");
+                return false;
+            }
+        }
+        if (!this.isType() && this.getCarrera().getSelectedIndex() == 0)
+        {
+            JOptionPane.showMessageDialog(null, "Debe indicar la carrera del estudiante para continuar");
+            return false;
+        }*/
+
+        Date fecha;
+        SimpleDateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy");
+        formato1.setLenient(false);
+        formato2.setLenient(false);
+
+        try
+        {
+            fecha = formato1.parse(this.getFecha().getText());
+        } catch (ParseException ex1)
+        {
+            try
+            {
+                fecha = formato2.parse(this.getFecha().getText());
+            } catch (ParseException ex2)
+            {
+                JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto");
+                ctrl.CtrlInterfaz.selecciona(this.fecha);
+                return false;
+            }
+        }
+        
+        /*if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto");
+            return false;
+        }
+        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().trim().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto actual");
+            return false;
+        }
+        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().trim().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el plan de tratamiento");
+            return false;
+        }
+        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().trim().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar el medicamento");
+            return false;
+        }
+        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().trim().isEmpty())
+        {
+            JOptionPane.showMessageDialog(null, "Debe especifacar los antecedentes");
+            return false;
+        }*/
+        return true;
     }
     
+    public boolean camposVacios()
+    {
+        if (this.getCve().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(cve);
+            return true;
+        }
+        if (this.getNombre().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(nombre);
+            return true;
+        }
+        if (this.getPrimerAp().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(primerAp);
+            return true;
+        }
+        if (this.getSegundoAp().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(segundoAp);
+            return true;
+        }
+        if (!this.getRadioButton1().isSelected() && !this.getRadioButton2().isSelected())
+        {
+            ctrl.CtrlInterfaz.cambia(radioButton1);
+            return true;
+        }
+        if (this.isType() && this.getEstatus().getSelectedIndex() == 0)
+        {
+            ctrl.CtrlInterfaz.cambia(estatus);
+            return true;
+        } else
+        {
+            if (this.getEstatus().getSelectedIndex() == 0)
+            {
+                ctrl.CtrlInterfaz.cambia(estatus);
+                return true;
+            }
+        }
+        if (!this.isType() && this.getCarrera().getSelectedIndex() == 0)
+        {
+            ctrl.CtrlInterfaz.cambia(carrera);
+            return true;
+        }
+        if(this.getFecha().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(fecha);
+            return true;
+        }
+        if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(otrasCual);
+            return true;
+        }
+        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(padecimientoCual);
+            return true;
+        }
+        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(planTratamientoCual);
+            return true;
+        }
+        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(medicamentoCual);
+            return true;
+        }
+        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(antecedentesCual);
+            return true;
+        }
+        return false;
+    }
+
     public void habilitarComponentes(boolean enable)
     {
         cve.setEnabled(false);
@@ -416,9 +861,9 @@ public class Formulario extends JPanel
         primerAp.setEnabled(false);
         segundoAp.setEnabled(false);
         estatus.setEnabled(enable);
-        if(!type)
+        if (!type)
         {
-            carrera.setEditable(enable);        
+            carrera.setEditable(enable);
         }
         radioButton1.setEnabled(enable);
         radioButton2.setEnabled(enable);
