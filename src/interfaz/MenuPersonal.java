@@ -53,6 +53,8 @@ public class MenuPersonal extends JPanel
     final String pathImagenes = "src/interfaz/imagenes/";
     private Formulario formularioRegistro;
     private final JLabel[] iconos = new JLabel[9];
+    private JPanel contenedorTabla;
+    private DefaultTableModel model;
 
     public MenuPersonal()
     {
@@ -71,15 +73,19 @@ public class MenuPersonal extends JPanel
     {
         panelHerramientas = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelHerramientas.setBackground(new Color(174, 214, 241));
-        iconos[0] = new JLabel();
-        iconos[1] = new JLabel();
-        iconos[2] = new JLabel();
-        iconos[3] = new JLabel();
-        iconos[4] = new JLabel();
-        iconos[5] = new JLabel();
-        iconos[6] = new JLabel();
-        iconos[7] = new JLabel();
-        iconos[8] = new JLabel();
+        for (int i = 0; i < iconos.length; i++)
+        {
+            iconos[i] = new JLabel();
+        }
+//        iconos[0] = new JLabel();
+//        iconos[1] = new JLabel();
+//        iconos[2] = new JLabel();
+//        iconos[3] = new JLabel();
+//        iconos[4] = new JLabel();
+//        iconos[5] = new JLabel();
+//        iconos[6] = new JLabel();
+//        iconos[7] = new JLabel();
+//        iconos[8] = new JLabel();
         String[] txt =
         {
             "Guardar", "Limpiar", "Buscar Registro", "Actualizar Registro", "Restablecer Registro", "Ordenar Ascendente", "Ordenar Descendente", "Ordenar Clave Ascendente", "Ordenar Clave Descendente"
@@ -280,11 +286,12 @@ public class MenuPersonal extends JPanel
             {
                 iconos[8].setIcon(new ImageIcon(pathImagenes + "ordenar_9-1_Hover.png"));
             }
-
+            
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                if(iconos[8].isEnabled())
+                    JOptionPane.showMessageDialog(null, "Hola");
             }
         });
 
@@ -331,6 +338,19 @@ public class MenuPersonal extends JPanel
                         break;
                     case 2:
                         habilitarHerraminetas(iconos[2], iconos[5], iconos[6], iconos[7], iconos[8]);
+                        contenedorTabla.removeAll();
+                        Datos[] lista = (Datos[]) ManipulacionArchivos.cargaArch(contenedorTabla, "personal.dat", false);        
+                        if(lista == null)
+                        {
+                            iconos[8].setEnabled(false);
+                            ctrl.CtrlInterfaz.habilita(false, iconos[5],iconos[6], iconos[7], iconos[8]);
+                        }else
+                        {
+                            ctrl.CtrlInterfaz.habilita(true, iconos[5],iconos[6], iconos[7], iconos[8]);
+                            model.setRowCount(0);
+                            contenedorTabla.add(llenarTabla(lista), BorderLayout.CENTER);
+                        }
+                        
                         break;
                 }
             }
@@ -474,98 +494,21 @@ public class MenuPersonal extends JPanel
 
     private void initPanelConsultar()
     {
-        JPanel contenedor = new JPanel(new BorderLayout());
-
-        /*Object[][] data =
-        {
-            {
-                "001", "Ana Maria de la luz", "López", "Martínez", "Femenino", "Activo", "Sí", "No", "No", "No", "No", "No"
-            },
-            {
-                "002", "Carlos", "García", "Hernández", "Masculino", "Inactivo", "No", "Sí", "No", "No", "No", "No"
-            },
-            {
-                "003", "María la de la pata fria", "Rodríguez", "Pérez", "Femenino", "Activo", "No", "No", "Sí", "No", "No", "No"
-            },
-            {
-                "004", "Javier", "Díaz", "Gómez", "Masculino", "Activo", "No", "No", "No", "Sí", "No", "No"
-            },
-            {
-                "005", "Laura", "Fernández", "López", "Femenino", "Inactivo", "No", "No", "No", "No", "Sí", "No"
-            },
-            {
-                "006", "Alejandro", "Martínez", "Sánchez", "Masculino", "Activo", "No", "Sí", "No", "No", "No", "No"
-            },
-            {
-                "007", "Elena", "Gómez", "Torres", "Femenino", "Inactivo", "No", "No", "No", "Sí", "No", "No"
-            },
-            {
-                "008", "Adrián", "Pérez", "García", "Masculino", "Activo", "No", "No", "No", "No", "No", "Sí"
-            },
-            {
-                "009", "Isabel", "López", "Martín", "Femenino", "Activo", "No", "No", "Sí", "No", "No", "No"
-            },
-            {
-                "010", "Daniel", "Fernández", "Gómez", "Masculino", "Inactivo", "Sí", "No", "No", "No", "No", "No"
-            }
-        };*/
-        
-        Datos[] lista = (Datos[]) ManipulacionArchivos.cargaArch(contenedor, "personal.dat");
-
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Campo1"); // Nombre de la columna 1
-        model.addColumn("Campo2"); // Nombre de la columna 2
-        model.addColumn("Campo3"); // Nombre de la columna 2
-        // Agregar más columnas según sea necesario
-
-        // Llenar el modelo con los datos del arreglo
-        for (Datos dato : lista) {
-            if(dato instanceof Personal)
-            {
-                Object[] fila = {dato.getCve(), dato.getNom(), (((Personal) dato).getEstatus() == 1)?"Permante":"Tempora"};
-                model.addRow(fila);
-            } 
-        }
-
-        // Crear la tabla con el modelo de datos
-        JTable table = new JTable(model);
-
-        // Colocar la tabla en un JScrollPane si hay muchos datos
-        JScrollPane scrollPane = new JScrollPane(table);
-        
-        // Nombres de las columnas
         String[] columnNames =
         {
             "Clave", "Nombre", "Primer A", "Segundo A", "Sexo", "Estatus", "Desnutricion", "Sobrepeso", "Alergias", "Obesida", "Diabetes", "Otra"
         };
-
-        // Crea una nueva tabla con los datos y nombres de columnas
-        //DefaultTableModel molde = new DefaultTableModel();
-        //molde.setColumnIdentifiers(columnNames);
-        //  molde.setDataVector(data, columnNames);
-        //JTable table = new JTable(data, columnNames);
-        /*DefaultTableModel model = new DefaultTableModel(lista, 13)
+        contenedorTabla = new JPanel(new BorderLayout());        
+        model = new DefaultTableModel()
         {
             @Override
             public boolean isCellEditable(int row, int column)
             {
-                return false; // Desactivar la edición de las celdas
+                return false;
             }
-        };*/
-        //JTable table = new JTable(model);
-        //table.setRowSelectionInterval(3, 3);
-        //TableColumn column;
-
-        // Crea un JScrollPane para agregar la tabla y permitir el desplazamiento si es necesario
-        //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        //table.setPreferredScrollableViewportSize(new Dimension(contenedor.getSize().width, contenedor.getSize().height));
-      //  JScrollPane scrollPane = new JScrollPane(table);
-        //table.setEnabled(false);
-        //scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-        //table.setEnabled(false);
-        contenedor.add(scrollPane, BorderLayout.CENTER);
-        tabbedPane.addTab("Consultar Registros", null, contenedor);
+        };
+        model.setColumnIdentifiers(columnNames);
+        tabbedPane.addTab("Consultar Registros", null, contenedorTabla);
     }
 
     private void initConsultaMedica()
@@ -673,12 +616,54 @@ public class MenuPersonal extends JPanel
                 if(ctrl.ManipulacionArchivos.guardarReg(panelAreaTrabajo, personal, "personal.dat"))
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro exitoso");
+                    formularioRegistro.limpiarFormulario();
                 }else
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo,"No se a podido guardar el Registo", "Error al guardar el registro", JOptionPane.ERROR_MESSAGE);
                 }
-                
             }
         }
+    }
+    
+    private JScrollPane llenarTabla(Datos[] lista)
+    {
+        for (Datos dato : lista) {
+            if(dato instanceof Personal)
+            {
+                Object[] fila = {dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(), 
+                    dato.getSexo(), (((Personal) dato).getEstatus() == 1)?"Permante":"Tempora", 
+                    dato.isDesnutriccion() ? "Si": "No", dato.isSobrepeso()? "Si": "No", dato.isAlergias()? "Si": "No",
+                    dato.isObecidad()? "Si": "No", dato.isDiabetes() ? "Si": "No", dato.getOtras()};
+                model.addRow(fila);
+            } 
+        }
+        JTable table = new JTable(model);
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+                    // Obtener la fila seleccionada
+                    int filaSeleccionada = table.getSelectedRow();
+                    
+                    // Hacer algo con la fila seleccionada
+                    if (filaSeleccionada != -1) {
+                        // Obtener los datos de la fila seleccionada
+                        Object valorColumna1 = table.getValueAt(filaSeleccionada, 0);
+                        Object valorColumna2 = table.getValueAt(filaSeleccionada, 1);
+                        
+                        // Hacer algo con los valores obtenidos
+                        System.out.println("Doble clic en la fila: " + filaSeleccionada);
+                        System.out.println("Valor en la Columna1: " + valorColumna1);
+                        System.out.println("Valor en la Columna2: " + valorColumna2);
+                    }
+                }
+            }
+        });
+        return new JScrollPane(table);
+    }
+    
+    private void filtrarTabla()
+    {
+        
     }
 }

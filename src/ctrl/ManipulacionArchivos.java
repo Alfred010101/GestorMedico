@@ -97,7 +97,7 @@ public class ManipulacionArchivos
 //        return obj;
 //    }
     
-    public static Object[] cargaArch(JPanel pn, String s)
+    public static Object[] cargaArch(JPanel pn, String s, boolean tipoError)
     {
         Object[] obj = null;
         try
@@ -108,7 +108,13 @@ public class ManipulacionArchivos
             arch.close();
         } catch (FileNotFoundException ex)
         {
-            JOptionPane.showMessageDialog(pn, "Si es la primera vez que realiza un registro\neste mensaje es normal.\nSi no es a si consulte al administrador ", "No se econtro el archivo", JOptionPane.WARNING_MESSAGE);
+            if (tipoError)
+            {
+                JOptionPane.showMessageDialog(pn, "Si es la primera vez que realiza un registro\neste mensaje es normal.\nSi no es a si consulte al administrador ", "No se econtro el archivo", JOptionPane.WARNING_MESSAGE);
+            }else
+            {
+                JOptionPane.showMessageDialog(pn, "No se han econtrado registros", "No se econtro el archivo", JOptionPane.WARNING_MESSAGE);
+            }
         } catch(Exception ex)
         {
             JOptionPane.showMessageDialog(pn, "Error..." + ex.toString(), "Error de conexion...", JOptionPane.ERROR_MESSAGE);
@@ -120,7 +126,7 @@ public class ManipulacionArchivos
     public static boolean guardarReg(JPanel pn, Datos obj, String s)
     {
         //Object[] obj = null;
-        Datos[] array = (Datos[]) ManipulacionArchivos.cargaArch(pn, "personal.dat");
+        Datos[] array = (Datos[]) ManipulacionArchivos.cargaArch(pn, "personal.dat", true);
        /* if(obj instanceof Personal)
         {
             array = (Personal[]) ManipulacionArchivos.cargaArch(pn, "personal.dat");

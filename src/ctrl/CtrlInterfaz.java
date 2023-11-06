@@ -13,6 +13,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -85,6 +86,10 @@ public class CtrlInterfaz
             if (obj instanceof JTextArea)
             {
                 ((JTextArea) obj).setEnabled(b);
+            }
+            if (obj instanceof JLabel)
+            {
+                ((JLabel) obj).setEnabled(b);
             }
         }
     }
