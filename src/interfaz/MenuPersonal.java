@@ -1,9 +1,9 @@
 package interfaz;
 
+import ctrl.ManipulacionArchivos;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,9 +13,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
@@ -23,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -34,10 +32,13 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import poo.Datos;
+import poo.Personal;
 
 /**
  *
@@ -50,16 +51,9 @@ public class MenuPersonal extends JPanel
     private JPanel panelAreaTrabajo;
     private JTabbedPane tabbedPane;
     final String pathImagenes = "src/interfaz/imagenes/";
-    
-//    private JLabel guardar;
-//    private JLabel limpiar ;
-//    private JLabel buscarReg ;
-//    private JLabel actualizarReg;
-//    private JLabel ordenarAlf;    
-//    private JLabel restablecer;
-    
-    private final JLabel[] iconos = new JLabel[6];
-    
+    private Formulario formularioRegistro;
+    private final JLabel[] iconos = new JLabel[9];
+
     public MenuPersonal()
     {
         this.setBackground(Color.WHITE);
@@ -83,53 +77,26 @@ public class MenuPersonal extends JPanel
         iconos[3] = new JLabel();
         iconos[4] = new JLabel();
         iconos[5] = new JLabel();
-         /*guardar = new JLabel();
-         limpiar = new JLabel();
-         buscarReg = new JLabel();
-         actualizarReg = new JLabel();
-         restablecer = new JLabel();
-         ordenarAlf = new JLabel();*/
-        String[] txt = {"Guardar", "Limpiar", "Buscar Registro", "Actualizar Registro", "Restablecer Registro", "Ordenar Ascendente"};
-        String[] normal = {"guardar.png", "limpiar.png", "buscar_registro.png", "actualizar.png", "restablecer.png", "ordenar_a-z.png"};
+        iconos[6] = new JLabel();
+        iconos[7] = new JLabel();
+        iconos[8] = new JLabel();
+        String[] txt =
+        {
+            "Guardar", "Limpiar", "Buscar Registro", "Actualizar Registro", "Restablecer Registro", "Ordenar Ascendente", "Ordenar Descendente", "Ordenar Clave Ascendente", "Ordenar Clave Descendente"
+        };
+        String[] normal =
+        {
+            "guardar.png", "limpiar.png", "buscar_registro.png", "actualizar.png", "restablecer.png", "ordenar_a-z.png", "ordenar_z-a.png", "ordenar_1-9.png", "ordenar_9-1.png"
+        };
         //String[] hover = {"guardar_Hover.png", "limpiar_Hover.png", "buscar_registro_Hover.png", "actualizar_Hover.png", "restablecer_Hover.png", "ordenar_a-z_Hover.png"};
         initHerramientas(txt, normal);
-        /*initHerramientas(txt, normal, guardar, limpiar, buscarReg, actualizarReg, restablecer, ordenarAlf);
-        iconos[0] = new JLabel(new ImageIcon(pathImagenes + "guardar.png"));
-        iconos[0].setBorder(new EmptyBorder(0, 5, 0, 5));
-        iconos[0].setCursor(new Cursor(Cursor.HAND_CURSOR));
-        iconos[0].setToolTipText("Guardar");
 
-        limpiar = new JLabel(new ImageIcon(pathImagenes + "limpiar.png"));
-        limpiar.setBorder(new EmptyBorder(0, 0, 0, 5));
-        limpiar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        limpiar.setToolTipText("Limpiar");
-        
-        buscarReg = new JLabel(new ImageIcon(pathImagenes + "buscar_registro.png"));
-        buscarReg.setBorder(new EmptyBorder(0, 0, 0, 5));
-        buscarReg.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        buscarReg.setToolTipText("Buscar Registro");
-        
-        actualizarReg = new JLabel(new ImageIcon(pathImagenes + "actualizar.png"));
-        actualizarReg.setBorder(new EmptyBorder(0, 0, 0, 5));
-        actualizarReg.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        actualizarReg.setToolTipText("Actualizar Registro");
-        
-        restablecer = new JLabel(new ImageIcon(pathImagenes + "restablecer.png"));
-        restablecer.setBorder(new EmptyBorder(0, 0, 0, 5));
-        restablecer.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        restablecer.setToolTipText("Restablecer Registro");
-        
-        ordenarAlf = new JLabel(new ImageIcon(pathImagenes + "ordenar_a-z.png"));
-        ordenarAlf.setBorder(new EmptyBorder(0, 0, 0, 5));
-        ordenarAlf.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        ordenarAlf.setToolTipText("Ordenar Ascendente");*/
-        
         iconos[0].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[0].setIcon(new ImageIcon(pathImagenes + "guardar.png"));
+                iconos[0].setIcon(new ImageIcon(pathImagenes + normal[0]));
             }
 
             @Override
@@ -141,7 +108,23 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                //JDialog customDialog = new JDialog(new JFrame(), "Ventana Emergente", true);
+                VentanaEmergente customDialog = new VentanaEmergente(new JFrame(), "Buscar Registro");
+
+                customDialog.setSize(500, 200);
+                customDialog.setLocationRelativeTo(null);
+                customDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                JPanel conDia = new JPanel();
+                // Agregar contenido al JDialog
+                JLabel label = new JLabel("Contenido de la ventana emergente");
+                conDia.setBorder(new LineBorder(Color.GRAY, 1));
+                conDia.add(label);
+
+                conDia.add(new JButton("Linux"));
+                customDialog.add(conDia);
+
+                // Mostrar el JDialog
+                customDialog.setVisible(true);
             }
         });
         iconos[1].addMouseListener(new MouseAdapter()
@@ -149,7 +132,7 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[1].setIcon(new ImageIcon(pathImagenes + "limpiar.png"));
+                iconos[1].setIcon(new ImageIcon(pathImagenes + normal[1]));
             }
 
             @Override
@@ -161,7 +144,7 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                formularioRegistro.limpiarFormulario();
             }
         });
         iconos[2].addMouseListener(new MouseAdapter()
@@ -169,7 +152,7 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[2].setIcon(new ImageIcon(pathImagenes + "buscar_registro.png"));
+                iconos[2].setIcon(new ImageIcon(pathImagenes + normal[2]));
             }
 
             @Override
@@ -189,7 +172,7 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[3].setIcon(new ImageIcon(pathImagenes + "actualizar.png"));
+                iconos[3].setIcon(new ImageIcon(pathImagenes + normal[3]));
             }
 
             @Override
@@ -209,7 +192,7 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[4].setIcon(new ImageIcon(pathImagenes + "restablecer.png"));
+                iconos[4].setIcon(new ImageIcon(pathImagenes + normal[4]));
             }
 
             @Override
@@ -229,7 +212,7 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[5].setIcon(new ImageIcon(pathImagenes + "ordenar_a-z.png"));
+                iconos[5].setIcon(new ImageIcon(pathImagenes + normal[5]));
             }
 
             @Override
@@ -244,21 +227,77 @@ public class MenuPersonal extends JPanel
                 //activarMenu(Menu.INICIO);
             }
         });
+        iconos[6].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[6].setIcon(new ImageIcon(pathImagenes + normal[6]));
+            }
 
-        /*buscarReg.setVisible(false);
-        actualizarReg.setVisible(false);
-        restablecer.setVisible(false);
-        ordenarAlf.setVisible(false);*/
-        iconos[2].setVisible(false);
-        iconos[3].setVisible(false);
-        iconos[4].setVisible(false);
-        iconos[5].setVisible(false);
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[6].setIcon(new ImageIcon(pathImagenes + "ordenar_z-a_Hover.png"));
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                //activarMenu(Menu.INICIO);
+            }
+        });
+        iconos[7].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[7].setIcon(new ImageIcon(pathImagenes + normal[7]));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[7].setIcon(new ImageIcon(pathImagenes + "ordenar_1-9_Hover.png"));
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                //activarMenu(Menu.INICIO);
+            }
+        });
+        iconos[8].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[8].setIcon(new ImageIcon(pathImagenes + normal[8]));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[8].setIcon(new ImageIcon(pathImagenes + "ordenar_9-1_Hover.png"));
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                //activarMenu(Menu.INICIO);
+            }
+        });
+
+        habilitarHerraminetas(iconos[0], iconos[1]);
         panelHerramientas.add(iconos[0]);
         panelHerramientas.add(iconos[1]);
         panelHerramientas.add(iconos[2]);
         panelHerramientas.add(iconos[3]);
         panelHerramientas.add(iconos[4]);
         panelHerramientas.add(iconos[5]);
+        panelHerramientas.add(iconos[6]);
+        panelHerramientas.add(iconos[7]);
+        panelHerramientas.add(iconos[8]);
     }
 
     private void initPanelSouth()
@@ -284,34 +323,16 @@ public class MenuPersonal extends JPanel
                 {
                     case 0:
                     case 3:
-//                        guardar.setVisible(true);
-//                        limpiar.setVisible(true);
-//                        buscarReg.setVisible(false);
-//                        actualizarReg.setVisible(false);
-//                        restablecer.setVisible(false);
-//                        ordenarAlf.setVisible(false);
-                          habilitarHerraminetas(iconos[0], iconos[1]);
+                        habilitarHerraminetas(iconos[0], iconos[1]);
                         break;
                     case 1:
-//                        guardar.setVisible(false);
-//                        limpiar.setVisible(false);
-//                        buscarReg.setVisible(false);
-//                        actualizarReg.setVisible(true);
-//                        restablecer.setVisible(true);
-//                        ordenarAlf.setVisible(false);
                         habilitarHerraminetas(iconos[3], iconos[4]);
-                        
+
                         break;
                     case 2:
-//                        guardar.setVisible(false);
-//                        limpiar.setVisible(false);
-//                        buscarReg.setVisible(true);
-//                        actualizarReg.setVisible(false);
-//                        restablecer.setVisible(false);
-//                        ordenarAlf.setVisible(true); 
-                        habilitarHerraminetas(iconos[2], iconos[5]);
-                        break;                    
-                }   
+                        habilitarHerraminetas(iconos[2], iconos[5], iconos[6], iconos[7], iconos[8]);
+                        break;
+                }
             }
         });
 
@@ -368,7 +389,7 @@ public class MenuPersonal extends JPanel
     private void initPanelRegistrar()
     {
         JPanel contenedor = new JPanel();
-        Formulario formulario = new Formulario(true);
+        formularioRegistro = new Formulario(true);
         JPanel contenedor2 = new JPanel();
 
         JButton btnCancelar = new JButton("Cancelar");
@@ -377,7 +398,7 @@ public class MenuPersonal extends JPanel
         contenedor2.add(btnGuardar);
 
         contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
-        contenedor.add(formulario);
+        contenedor.add(formularioRegistro);
         contenedor.add(contenedor2);
         tabbedPane.addTab("Nuevo Registro", null, contenedor);
 
@@ -386,20 +407,18 @@ public class MenuPersonal extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                if (formulario.camposVacios())
-                {
-                    JOptionPane.showMessageDialog(null, "Todos los campos requeridos deben ser llenados, verifique si a activado algun checkbox que requiera mas informacion este no puede quedar vacio");
-                } else
-                {
-                    if (formulario.validarFormulario())
-                    {
-                        JOptionPane.showMessageDialog(null, "Registro exitoso");
-                    }
-                }
-
+                guardarNuevoRegistro();
             }
         }
         );
+        btnCancelar.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                formularioRegistro.limpiarFormulario();
+            }
+        });
     }
 
     private void initPanelModificar()
@@ -452,12 +471,12 @@ public class MenuPersonal extends JPanel
             }
         });
     }
-    
+
     private void initPanelConsultar()
     {
         JPanel contenedor = new JPanel(new BorderLayout());
 
-        Object[][] data =
+        /*Object[][] data =
         {
             {
                 "001", "Ana Maria de la luz", "López", "Martínez", "Femenino", "Activo", "Sí", "No", "No", "No", "No", "No"
@@ -489,8 +508,31 @@ public class MenuPersonal extends JPanel
             {
                 "010", "Daniel", "Fernández", "Gómez", "Masculino", "Inactivo", "Sí", "No", "No", "No", "No", "No"
             }
-        };
+        };*/
+        
+        Datos[] lista = (Datos[]) ManipulacionArchivos.cargaArch(contenedor, "personal.dat");
 
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Campo1"); // Nombre de la columna 1
+        model.addColumn("Campo2"); // Nombre de la columna 2
+        model.addColumn("Campo3"); // Nombre de la columna 2
+        // Agregar más columnas según sea necesario
+
+        // Llenar el modelo con los datos del arreglo
+        for (Datos dato : lista) {
+            if(dato instanceof Personal)
+            {
+                Object[] fila = {dato.getCve(), dato.getNom(), (((Personal) dato).getEstatus() == 1)?"Permante":"Tempora"};
+                model.addRow(fila);
+            } 
+        }
+
+        // Crear la tabla con el modelo de datos
+        JTable table = new JTable(model);
+
+        // Colocar la tabla en un JScrollPane si hay muchos datos
+        JScrollPane scrollPane = new JScrollPane(table);
+        
         // Nombres de las columnas
         String[] columnNames =
         {
@@ -500,26 +542,24 @@ public class MenuPersonal extends JPanel
         // Crea una nueva tabla con los datos y nombres de columnas
         //DefaultTableModel molde = new DefaultTableModel();
         //molde.setColumnIdentifiers(columnNames);
-      //  molde.setDataVector(data, columnNames);
+        //  molde.setDataVector(data, columnNames);
         //JTable table = new JTable(data, columnNames);
-        
-        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+        /*DefaultTableModel model = new DefaultTableModel(lista, 13)
+        {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(int row, int column)
+            {
                 return false; // Desactivar la edición de las celdas
             }
-        };
-        JTable table = new JTable(model);
-        table.setRowSelectionInterval(3, 3);
-        table.setRowSelectionInterval(5, 5);
-        TableColumn column;
-        
-       
-        
+        };*/
+        //JTable table = new JTable(model);
+        //table.setRowSelectionInterval(3, 3);
+        //TableColumn column;
+
         // Crea un JScrollPane para agregar la tabla y permitir el desplazamiento si es necesario
         //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         //table.setPreferredScrollableViewportSize(new Dimension(contenedor.getSize().width, contenedor.getSize().height));
-        JScrollPane scrollPane = new JScrollPane(table);
+      //  JScrollPane scrollPane = new JScrollPane(table);
         //table.setEnabled(false);
         //scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
@@ -527,7 +567,7 @@ public class MenuPersonal extends JPanel
         contenedor.add(scrollPane, BorderLayout.CENTER);
         tabbedPane.addTab("Consultar Registros", null, contenedor);
     }
-    
+
     private void initConsultaMedica()
     {
         JPanel conten = new JPanel();
@@ -578,15 +618,14 @@ public class MenuPersonal extends JPanel
             }
         });
     }
-    
+
     private void initHerramientas(String[] txt, String[] normal)
     {
-        if(txt.length == normal.length && normal.length == iconos.length)
+        if (txt.length == normal.length && normal.length == iconos.length)
         {
             for (int i = 0; i < txt.length; i++)
             {
                 ImageIcon img = new ImageIcon(pathImagenes + "" + normal[i]);
-                //icons[i] = new JLabel(new ImageIcon());
                 iconos[i].setIcon(img);
                 iconos[i].setBorder(new EmptyBorder(0, 0, 0, 5));
                 iconos[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -594,10 +633,10 @@ public class MenuPersonal extends JPanel
             }
         }
     }
-    
+
     private void habilitarHerraminetas(JLabel... s)
     {
-        if(s.length <= iconos.length)
+        if (s.length <= iconos.length)
         {
             for (JLabel icono : iconos)
             {
@@ -609,7 +648,36 @@ public class MenuPersonal extends JPanel
                         break;
                     }
                     icono.setVisible(false);
-                }           
+                }
+            }
+        }
+    }
+
+    private void guardarNuevoRegistro()
+    {
+        if (formularioRegistro.camposVacios())
+        {
+            JOptionPane.showMessageDialog(null, "Todos los campos requeridos deben ser llenados, verifique si a activado algun checkbox que requiera mas informacion este no puede quedar vacio");
+        } else
+        {
+            if (formularioRegistro.validarFormulario())
+            {
+                
+                Datos personal = new Personal(formularioRegistro.getEstatus().getSelectedIndex(),
+                        formularioRegistro.getCve().getText(), formularioRegistro.getNombre().getText(),
+                        formularioRegistro.getPrimerAp().getText(),formularioRegistro.getSegundoAp().getText(), 
+                        (formularioRegistro.getRadioButton1().isSelected()) ? 'H':'M', 
+                        formularioRegistro.getDesnutricion().isSelected(), formularioRegistro.getSobrepeso().isSelected(),
+                        formularioRegistro.getAlergias().isSelected(), formularioRegistro.getObesidad().isSelected(), 
+                        formularioRegistro.getDiabetes().isSelected(), formularioRegistro.getOtrasCual().getText());
+                if(ctrl.ManipulacionArchivos.guardarReg(panelAreaTrabajo, personal, "personal.dat"))
+                {
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro exitoso");
+                }else
+                {
+                    JOptionPane.showMessageDialog(panelAreaTrabajo,"No se a podido guardar el Registo", "Error al guardar el registro", JOptionPane.ERROR_MESSAGE);
+                }
+                
             }
         }
     }

@@ -231,4 +231,38 @@ public class CtrlInterfaz
             }
         }
     }
+    
+    public static void limpiarComponentes(Object obj, Object... componentes)
+    {
+        for (Object componente : componentes)
+        {
+            if(componente == null)
+            {
+                continue;
+            }
+            if (componente instanceof JTextField)
+            {
+                ((JTextField) componente).setText("");
+            } else if (componente instanceof JComboBox)
+            {
+                ((JComboBox) componente).setSelectedIndex(0);
+            } else if (componente instanceof JTextArea)
+            {
+                ((JTextArea) componente).setText("");
+            }else if (componente instanceof JRadioButton)
+            {
+                ((JRadioButton) componente).setSelected(true);
+            }else if (componente instanceof ButtonGroup)
+            {
+                ((ButtonGroup) componente).clearSelection();
+            }else if (componente instanceof JCheckBox)
+            {
+                ((JCheckBox) componente).setSelected(false);
+            }
+        }
+        if(obj != null)
+        {
+            cambia(obj);
+        }
+    }
 }

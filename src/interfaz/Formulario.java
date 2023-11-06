@@ -60,6 +60,7 @@ public class Formulario extends JPanel
     private JCheckBox planTratamiento;
     private JTextArea planTratamientoCual;
     private JTextField fecha;
+    private ButtonGroup group;
     private JRadioButton radioButton1;
     private JRadioButton radioButton2;
     final private boolean type;
@@ -339,7 +340,7 @@ public class Formulario extends JPanel
         panelSexo.setBorder(titledBorder);
         radioButton1 = new JRadioButton("Hombre");
         radioButton2 = new JRadioButton("Mujer");
-        ButtonGroup group = new ButtonGroup();
+        group = new ButtonGroup();
         group.add(radioButton1);
         group.add(radioButton2);
         panelSexo.add(radioButton1);
@@ -704,29 +705,7 @@ public class Formulario extends JPanel
             ctrl.CtrlInterfaz.selecciona(segundoAp);
             return false;
         }
-        /*if (!this.getRadioButton1().isSelected() && !this.getRadioButton2().isSelected())
-        {
-            JOptionPane.showMessageDialog(null, "Debe asignar un sexo para continuar");
-            return false;
-        }
-        if (this.isType() && this.getEstatus().getSelectedIndex() == 0)
-        {
-            JOptionPane.showMessageDialog(null, "Debe asignar un estatus al personal para continuar");
-            return false;
-        } else
-        {
-            if (this.getEstatus().getSelectedIndex() == 0)
-            {
-                JOptionPane.showMessageDialog(null, "Debe indicar con quien vive el estudiante para continuar");
-                return false;
-            }
-        }
-        if (!this.isType() && this.getCarrera().getSelectedIndex() == 0)
-        {
-            JOptionPane.showMessageDialog(null, "Debe indicar la carrera del estudiante para continuar");
-            return false;
-        }*/
-
+        
         Date fecha;
         SimpleDateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy");
@@ -748,32 +727,6 @@ public class Formulario extends JPanel
                 return false;
             }
         }
-        
-        /*if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
-        {
-            JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto");
-            return false;
-        }
-        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().trim().isEmpty())
-        {
-            JOptionPane.showMessageDialog(null, "Debe especifacar el padecimineto actual");
-            return false;
-        }
-        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().trim().isEmpty())
-        {
-            JOptionPane.showMessageDialog(null, "Debe especifacar el plan de tratamiento");
-            return false;
-        }
-        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().trim().isEmpty())
-        {
-            JOptionPane.showMessageDialog(null, "Debe especifacar el medicamento");
-            return false;
-        }
-        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().trim().isEmpty())
-        {
-            JOptionPane.showMessageDialog(null, "Debe especifacar los antecedentes");
-            return false;
-        }*/
         return true;
     }
     
@@ -852,6 +805,12 @@ public class Formulario extends JPanel
             return true;
         }
         return false;
+    }
+    
+    public void limpiarFormulario()
+    {
+        ctrl.CtrlInterfaz.limpiarComponentes(null, cve, nombre, primerAp, segundoAp, estatus, carrera, group, desnutricion, sobrepeso, alergias, obesidad, diabetes, otras, otrasCual);
+        ctrl.CtrlInterfaz.limpiarComponentes(cve, fecha, padecimientoActual, padecimientoCual, antecedentes, antecedentesCual, medicamento, medicamentoCual, planTratamiento, planTratamientoCual);
     }
 
     public void habilitarComponentes(boolean enable)

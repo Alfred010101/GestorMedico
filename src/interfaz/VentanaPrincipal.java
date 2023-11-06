@@ -93,6 +93,7 @@ public class VentanaPrincipal extends JFrame
         panelPrincipal.setBorder(new LineBorder(Color.GRAY, 2));
 
         panelNorth = new ImagenPanel(new Color(133, 193, 233));
+        panelNorth.setBorder(new LineBorder(Color.GRAY, 1));
         panelWest = new JPanel();
         panelCenter = new JPanel();
 
