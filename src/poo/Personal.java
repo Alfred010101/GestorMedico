@@ -10,14 +10,14 @@ package poo;
  */
 public class Personal extends Datos
 {
-    private char estatus;
+    private int estatus;
 
     public Personal() 
     {
         
     }
 
-    public Personal(char estatus, String cve, String nom, String primerAp, String segundoAp, char sexo, boolean desnutriccion, boolean sobrepeso, boolean alergias, boolean obecidad, boolean diabetes, String otras) 
+    public Personal(int estatus, String cve, String nom, String primerAp, String segundoAp, char sexo, boolean desnutriccion, boolean sobrepeso, boolean alergias, boolean obecidad, boolean diabetes, String otras) 
     {
         super(cve, nom, primerAp, segundoAp, sexo, desnutriccion, sobrepeso, alergias, obecidad, diabetes, otras);
         this.estatus = estatus;
@@ -26,7 +26,7 @@ public class Personal extends Datos
     /**
      * @return the estatus
      */
-    public char getEstatus() 
+    public int getEstatus() 
     {
         return estatus;
     }

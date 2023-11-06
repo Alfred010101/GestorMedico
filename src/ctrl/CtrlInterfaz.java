@@ -13,6 +13,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -85,6 +86,10 @@ public class CtrlInterfaz
             if (obj instanceof JTextArea)
             {
                 ((JTextArea) obj).setEnabled(b);
+            }
+            if (obj instanceof JLabel)
+            {
+                ((JLabel) obj).setEnabled(b);
             }
         }
     }
@@ -229,6 +234,40 @@ public class CtrlInterfaz
                 ((JTextField)obj).setEnabled(false);
                 ((JTextField)obj).setText("");
             }
+        }
+    }
+    
+    public static void limpiarComponentes(Object obj, Object... componentes)
+    {
+        for (Object componente : componentes)
+        {
+            if(componente == null)
+            {
+                continue;
+            }
+            if (componente instanceof JTextField)
+            {
+                ((JTextField) componente).setText("");
+            } else if (componente instanceof JComboBox)
+            {
+                ((JComboBox) componente).setSelectedIndex(0);
+            } else if (componente instanceof JTextArea)
+            {
+                ((JTextArea) componente).setText("");
+            }else if (componente instanceof JRadioButton)
+            {
+                ((JRadioButton) componente).setSelected(true);
+            }else if (componente instanceof ButtonGroup)
+            {
+                ((ButtonGroup) componente).clearSelection();
+            }else if (componente instanceof JCheckBox)
+            {
+                ((JCheckBox) componente).setSelected(false);
+            }
+        }
+        if(obj != null)
+        {
+            cambia(obj);
         }
     }
 }

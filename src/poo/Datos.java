@@ -4,11 +4,13 @@
  */
 package poo;
 
+import java.io.Serializable;
+
 /**
  *
  * @author zoebe
  */
-public class Datos 
+public class Datos implements Serializable
 {
     private String cve;
     private String nom;
@@ -217,8 +219,6 @@ public class Datos
     {
         this.otras = otras;
     }
-    
-    
 }
 
 
