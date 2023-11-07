@@ -18,6 +18,7 @@ import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -52,7 +53,8 @@ public class MenuPersonal extends JPanel
     private JTabbedPane tabbedPane;
     final String pathImagenes = "src/interfaz/imagenes/";
     private Formulario formularioRegistro;
-    private final JLabel[] iconos = new JLabel[9];
+    private final JLabel[] iconos = new JLabel[13];
+    private JComboBox padecimientos;
     private JPanel contenedorTabla;
     private DefaultTableModel model;
 
@@ -77,22 +79,15 @@ public class MenuPersonal extends JPanel
         {
             iconos[i] = new JLabel();
         }
-//        iconos[0] = new JLabel();
-//        iconos[1] = new JLabel();
-//        iconos[2] = new JLabel();
-//        iconos[3] = new JLabel();
-//        iconos[4] = new JLabel();
-//        iconos[5] = new JLabel();
-//        iconos[6] = new JLabel();
-//        iconos[7] = new JLabel();
-//        iconos[8] = new JLabel();
+        
+        padecimientos = new JComboBox(new String[] {"","Desnutricion", "Sobrepeso", "Alergias", "Obesidad", "Diabetes", "Otra"});
         String[] txt =
         {
-            "Guardar", "Limpiar", "Buscar Registro", "Actualizar Registro", "Restablecer Registro", "Ordenar Ascendente", "Ordenar Descendente", "Ordenar Clave Ascendente", "Ordenar Clave Descendente"
+            "Guardar", "Limpiar", "Buscar Registro", "Actualizar Registro", "Restablecer Registro", "Ordenar Ascendente", "Ordenar Descendente", "Ordenar Clave Ascendente", "Ordenar Clave Descendente", "Ambos", "Hombre", "Mujer", "Limpiar Filtros"
         };
         String[] normal =
         {
-            "guardar.png", "limpiar.png", "buscar_registro.png", "actualizar.png", "restablecer.png", "ordenar_a-z.png", "ordenar_z-a.png", "ordenar_1-9.png", "ordenar_9-1.png"
+            "guardar.png", "limpiar.png", "buscar_registro.png", "actualizar.png", "restablecer.png", "ordenar_a-z.png", "ordenar_z-a.png", "ordenar_1-9.png", "ordenar_9-1.png", "ambos.png", "hombre.png", "mujer.png", "fitros.png"
         };
         //String[] hover = {"guardar_Hover.png", "limpiar_Hover.png", "buscar_registro_Hover.png", "actualizar_Hover.png", "restablecer_Hover.png", "ordenar_a-z_Hover.png"};
         initHerramientas(txt, normal);
@@ -115,7 +110,7 @@ public class MenuPersonal extends JPanel
             public void mouseClicked(MouseEvent evt)
             {
                 //JDialog customDialog = new JDialog(new JFrame(), "Ventana Emergente", true);
-                VentanaEmergente customDialog = new VentanaEmergente(new JFrame(), "Buscar Registro");
+               /* VentanaEmergente customDialog = new VentanaEmergente(new JFrame(), "Buscar Registro");
 
                 customDialog.setSize(500, 200);
                 customDialog.setLocationRelativeTo(null);
@@ -130,7 +125,8 @@ public class MenuPersonal extends JPanel
                 customDialog.add(conDia);
 
                 // Mostrar el JDialog
-                customDialog.setVisible(true);
+                customDialog.setVisible(true);*/
+                guardarNuevoRegistro();
             }
         });
         iconos[1].addMouseListener(new MouseAdapter()
@@ -294,8 +290,93 @@ public class MenuPersonal extends JPanel
                     JOptionPane.showMessageDialog(null, "Hola");
             }
         });
+        iconos[9].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[9].setIcon(new ImageIcon(pathImagenes + normal[9]));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[9].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                if(iconos[9].isEnabled())
+                    JOptionPane.showMessageDialog(null, "Hola");
+            }
+        });
+        iconos[10].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[10].setIcon(new ImageIcon(pathImagenes + normal[10]));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[10].setIcon(new ImageIcon(pathImagenes + "hombre_Hover.png"));
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                if(iconos[10].isEnabled())
+                    JOptionPane.showMessageDialog(null, "Hola");
+            }
+        });
+        iconos[11].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[11].setIcon(new ImageIcon(pathImagenes + normal[11]));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[11].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                if(iconos[11].isEnabled())
+                    JOptionPane.showMessageDialog(null, "Hola");
+            }
+        });
+        iconos[12].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[12].setIcon(new ImageIcon(pathImagenes + normal[12]));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[12].setIcon(new ImageIcon(pathImagenes + "fitros_Hover.png"));
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                if(iconos[12].isEnabled())
+                    JOptionPane.showMessageDialog(null, "Hola");
+            }
+        });
 
         habilitarHerraminetas(iconos[0], iconos[1]);
+        padecimientos.setVisible(false);
         panelHerramientas.add(iconos[0]);
         panelHerramientas.add(iconos[1]);
         panelHerramientas.add(iconos[2]);
@@ -305,6 +386,11 @@ public class MenuPersonal extends JPanel
         panelHerramientas.add(iconos[6]);
         panelHerramientas.add(iconos[7]);
         panelHerramientas.add(iconos[8]);
+        panelHerramientas.add(iconos[9]);
+        panelHerramientas.add(iconos[10]);
+        panelHerramientas.add(iconos[11]);
+        panelHerramientas.add(padecimientos);
+        panelHerramientas.add(iconos[12]);
     }
 
     private void initPanelSouth()
@@ -326,6 +412,7 @@ public class MenuPersonal extends JPanel
             public void stateChanged(ChangeEvent e)
             {
                 int selectedIndex = tabbedPane.getSelectedIndex();
+                padecimientos.setVisible(false);
                 switch (selectedIndex)
                 {
                     case 0:
@@ -337,16 +424,17 @@ public class MenuPersonal extends JPanel
 
                         break;
                     case 2:
-                        habilitarHerraminetas(iconos[2], iconos[5], iconos[6], iconos[7], iconos[8]);
+                        padecimientos.setVisible(true);
+                        habilitarHerraminetas(iconos[2], iconos[5], iconos[6], iconos[7], iconos[8],iconos[9], iconos[10], iconos[11], iconos[12]);
                         contenedorTabla.removeAll();
                         Datos[] lista = (Datos[]) ManipulacionArchivos.cargaArch(contenedorTabla, "personal.dat", false);        
                         if(lista == null)
                         {
-                            iconos[8].setEnabled(false);
-                            ctrl.CtrlInterfaz.habilita(false, iconos[5],iconos[6], iconos[7], iconos[8]);
+                            //iconos[8].setEnabled(false);
+                            ctrl.CtrlInterfaz.habilita(false, iconos[5],iconos[6], iconos[7], iconos[8], iconos[9], iconos[10], iconos[11], padecimientos, iconos [12]);
                         }else
                         {
-                            ctrl.CtrlInterfaz.habilita(true, iconos[5],iconos[6], iconos[7], iconos[8]);
+                            ctrl.CtrlInterfaz.habilita(true, iconos[5],iconos[6], iconos[7], iconos[8], iconos[9], iconos[10], iconos[11], padecimientos, iconos [12]);
                             model.setRowCount(0);
                             contenedorTabla.add(llenarTabla(lista), BorderLayout.CENTER);
                         }
