@@ -56,8 +56,10 @@ public class MenuPersonal extends JPanel
     private final JLabel[] iconos = new JLabel[13];
     private JComboBox padecimientos;
     private JPanel contenedorTabla;
+    private JTable tabla;
     private DefaultTableModel model;
-
+    private Datos[] tablaMostrar;
+    private boolean tipoOrdenamiento = true;
     public MenuPersonal()
     {
         this.setBackground(Color.WHITE);
@@ -166,7 +168,21 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                if(iconos[2].isEnabled())
+                {
+                    int[] index = buscarNombre(JOptionPane.showInputDialog("Ingrese nombre"));
+                    if(index != null)
+                    {
+                        
+                        //tabla.removeAll();
+                        //model.setRowCount(0);
+                        //llenarTabla(tablaMostrar);
+                        tabla.setRowSelectionInterval(index[0], index[0]);
+                    }else
+                    {
+                        JOptionPane.showMessageDialog(null,"El dato ingresado no se ha encontrado en los registro");
+                    }
+                }
             }
         });
         iconos[3].addMouseListener(new MouseAdapter()
@@ -226,7 +242,30 @@ public class MenuPersonal extends JPanel
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                if(iconos[5].isEnabled() && tablaMostrar != null)
+                {
+                    Datos tmp;
+                    for (int i = 0; i < tablaMostrar.length; i++)
+                    {
+                        for (int j = 0; j < tablaMostrar.length - 1; j++)
+                        {
+                            if(tipoOrdenamiento && tablaMostrar[j].getNom().compareTo(tablaMostrar[j + 1].getNom()) > 0)
+                            {
+                                tmp = tablaMostrar[j];
+                                tablaMostrar[j] = tablaMostrar[j +1];
+                                tablaMostrar[j + 1] =  tmp;
+                            }else if(!tipoOrdenamiento && tablaMostrar[j].getNom().compareTo(tablaMostrar[j + 1].getNom()) < 0)
+                            {
+                                tmp = tablaMostrar[j];
+                                tablaMostrar[j] = tablaMostrar[j +1];
+                                tablaMostrar[j + 1] =  tmp;
+                            }
+                        }
+                    }
+                    tipoOrdenamiento = (!tipoOrdenamiento);
+                    model.setRowCount(0);
+                    llenarTabla(tablaMostrar);
+                }
             }
         });
         iconos[6].addMouseListener(new MouseAdapter()
@@ -383,14 +422,14 @@ public class MenuPersonal extends JPanel
         panelHerramientas.add(iconos[3]);
         panelHerramientas.add(iconos[4]);
         panelHerramientas.add(iconos[5]);
-        panelHerramientas.add(iconos[6]);
-        panelHerramientas.add(iconos[7]);
-        panelHerramientas.add(iconos[8]);
+        //panelHerramientas.add(iconos[6]);
+        //panelHerramientas.add(iconos[7]);
+        //panelHerramientas.add(iconos[8]);
         panelHerramientas.add(iconos[9]);
         panelHerramientas.add(iconos[10]);
         panelHerramientas.add(iconos[11]);
         panelHerramientas.add(padecimientos);
-        panelHerramientas.add(iconos[12]);
+        //panelHerramientas.add(iconos[12]);
     }
 
     private void initPanelSouth()
@@ -426,7 +465,7 @@ public class MenuPersonal extends JPanel
                     case 2:
                         padecimientos.setVisible(true);
                         habilitarHerraminetas(iconos[2], iconos[5], iconos[6], iconos[7], iconos[8],iconos[9], iconos[10], iconos[11], iconos[12]);
-                        contenedorTabla.removeAll();
+                       // contenedorTabla.removeAll();
                         Datos[] lista = (Datos[]) ManipulacionArchivos.cargaArch(contenedorTabla, "personal.dat", false);        
                         if(lista == null)
                         {
@@ -704,7 +743,7 @@ public class MenuPersonal extends JPanel
                 if(ctrl.ManipulacionArchivos.guardarReg(panelAreaTrabajo, personal, "personal.dat"))
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro exitoso");
-                    formularioRegistro.limpiarFormulario();
+                    //formularioRegistro.limpiarFormulario();
                 }else
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo,"No se a podido guardar el Registo", "Error al guardar el registro", JOptionPane.ERROR_MESSAGE);
@@ -715,6 +754,7 @@ public class MenuPersonal extends JPanel
     
     private JScrollPane llenarTabla(Datos[] lista)
     {
+        tablaMostrar = lista;
         for (Datos dato : lista) {
             if(dato instanceof Personal)
             {
@@ -725,19 +765,19 @@ public class MenuPersonal extends JPanel
                 model.addRow(fila);
             } 
         }
-        JTable table = new JTable(model);
-        table.addMouseListener(new MouseAdapter() {
+        tabla = new JTable(model);
+        tabla.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
                     // Obtener la fila seleccionada
-                    int filaSeleccionada = table.getSelectedRow();
+                    int filaSeleccionada = tabla.getSelectedRow();
                     
                     // Hacer algo con la fila seleccionada
                     if (filaSeleccionada != -1) {
                         // Obtener los datos de la fila seleccionada
-                        Object valorColumna1 = table.getValueAt(filaSeleccionada, 0);
-                        Object valorColumna2 = table.getValueAt(filaSeleccionada, 1);
+                        Object valorColumna1 = tabla.getValueAt(filaSeleccionada, 0);
+                        Object valorColumna2 = tabla.getValueAt(filaSeleccionada, 1);
                         
                         // Hacer algo con los valores obtenidos
                         System.out.println("Doble clic en la fila: " + filaSeleccionada);
@@ -747,11 +787,56 @@ public class MenuPersonal extends JPanel
                 }
             }
         });
-        return new JScrollPane(table);
+        return new JScrollPane(tabla);
     }
     
-    private void filtrarTabla()
+    private int[] buscarNombre(String nombre)
     {
-        
+        int[] arryB = null;
+        if(tablaMostrar != null)
+        {
+            for (int i = 0; i < tablaMostrar.length; i++)
+            {
+                if (tablaMostrar[i].getNom().equalsIgnoreCase(nombre))
+                {
+                    if(arryB == null)
+                    {
+                        arryB = new int[1];
+                        arryB[0] = i; 
+                    }else
+                    {
+                        int[] tmpArray = new int[arryB.length];
+                        System.arraycopy(arryB, 0, tmpArray, 0, arryB.length);
+                        tmpArray[arryB.length] = 1;
+                        arryB = tmpArray;
+                    }
+                    System.out.println(i);
+                }
+            }
+        }
+        return arryB;
     }
+    
+    private void filtrar(char genero)
+    {
+//        Datos[] tmp;
+//        for (int i = 0; i < tablaMostrar.length; i++)
+//        {
+//            if(tablaMostrar[i].getSexo() == genero)
+//            {
+//                if(tmp == null)
+//                    {
+//                        tmp = new Datos[1];
+//                        tmp[0] = tablaMostrar[i]; 
+//                    }else
+//                    {
+//                        Datos[] tmpArray = new Datos[tmp.length];
+//                        System.arraycopy(tmp, 0, tmpArray, 0, tmp.length);
+//                        tmpArray[tmp.length] = tablaMostrar[i];
+//                        tmp = tmpArray;
+//                    }
+//            }
+//        }
+    }
+            
 }

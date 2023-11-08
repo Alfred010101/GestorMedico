@@ -156,16 +156,16 @@ public class ManipulacionArchivos
         }*/
        
        
-            if (array == null)
-            {
-                array = new Datos[1];
-            }else
-            {
-                Datos nvoArray[] = new Datos[array.length + 1];
-                System.arraycopy(array, 0, nvoArray, 0, array.length);
-                array = nvoArray;
-            }
-            array[array.length - 1] = obj;
+        if (array == null)
+        {
+            array = new Datos[1];
+        }else
+        {
+            Datos nvoArray[] = new Datos[array.length + 1];
+            System.arraycopy(array, 0, nvoArray, 0, array.length);
+            array = nvoArray;
+        }
+        array[array.length - 1] = obj;
         try
         {
             FileOutputStream fos = new FileOutputStream(ruta + s);
