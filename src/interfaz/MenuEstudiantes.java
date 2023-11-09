@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -82,8 +83,8 @@ public class MenuEstudiantes extends JPanel
     
     private void initPanelRegistrar()
     {
-        JPanel contenedor = new JPanel();
-        Formulario formulario = new Formulario(false);
+        
+        FormularioDatos formulario = new FormularioDatos(false);
         JPanel contenedor2 = new JPanel();
         
         JButton btnCancelar = new JButton("Cancelar");
@@ -91,10 +92,12 @@ public class MenuEstudiantes extends JPanel
         JButton btnGuardar = new JButton("Guardar");
         contenedor2.add(btnGuardar);
         
-        contenedor.setLayout(new BoxLayout(contenedor,BoxLayout.Y_AXIS));
-        contenedor.add(formulario);
-        contenedor.add(contenedor2);
-        tabbedPane.addTab("Registrar", null, contenedor);
+        //contenedor.setLayout(new BoxLayout(contenedor,BoxLayout.Y_AXIS));
+        
+        //JScrollPane contenedor = new JScrollPane(formulario);
+        //contenedor.add(formulario);
+        //contenedor.add(contenedor2);
+        tabbedPane.addTab("Registrar", null, new JScrollPane(formulario));
         
         btnGuardar.addActionListener(new ActionListener()
         {

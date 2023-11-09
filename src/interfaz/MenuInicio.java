@@ -21,7 +21,10 @@ public class MenuInicio extends JPanel
     JPanel panelB;
     JPanel panelC;
     JPanel panelD;
-
+    private final Color[] relleno =
+        {
+            new Color(4431943), new Color(16757504), new Color(48340), new Color(14794471), new Color(49061), new Color(16733986)
+        };
     public MenuInicio()
     {
         this.setLayout(new GridLayout(2, 2));
@@ -49,10 +52,9 @@ public class MenuInicio extends JPanel
 
     private void initPanelA()
     {
-
         int[] datosX =
         {
-            261, 10, 20, 30, 40, 50
+            26, 10, 20, 30, 40, 50
         };
         int[] datosY =
         {
@@ -100,10 +102,6 @@ public class MenuInicio extends JPanel
                 1, 20, 0, 10, 4, 10
             }
         };
-        Color[] relleno =
-        {
-            Color.BLUE, Color.ORANGE, Color.PINK, Color.YELLOW, Color.GREEN, Color.PINK
-        };
         GraficoDeLineas graficoBarras = new GraficoDeLineas("Comparacion de consultas semanales", datos, relleno);
         panelC.add(graficoBarras);
     }
@@ -112,15 +110,11 @@ public class MenuInicio extends JPanel
     {
         String[] encabezados =
         {
-            "Carreara 1", "Carrera 2", "Carrera 3", "Carrera 4", "Carrera 5", "Personal"
-        };
+            "Ing. en Software", "Ing. en P.I.", "Ing. en Plasticos", "Ing. Mecanica", "Lic. en S. Ciudadana", "Personal"
+        };        
         int[] datos =
         {
             14, 80, 20, 30, 40, 60
-        };
-        Color[] relleno =
-        {
-            Color.BLUE, Color.ORANGE, Color.PINK, Color.YELLOW, Color.GREEN, Color.PINK
         };
         GraficoPastel graficoBarras = new GraficoPastel("Cantidad de registros", encabezados, datos, relleno);
         panelD.add(graficoBarras);
@@ -152,10 +146,11 @@ class GraficoBarras extends JPanel
         int height = getHeight();
         obtenerMayoDato();
 
-        g.setColor(Color.BLUE);
+        g.setColor(new Color(4367861));
+        //g.setColor(new Color(6600182));
         g.fillRect(57, 5, 10, 10);
         g.drawString("Hombres", 70, 15);
-        g.setColor(Color.PINK);
+        g.setColor(new Color(15753874));
         g.fillRect(130, 5, 10, 10);
         g.drawString("Mujeres", 143, 15);
 
@@ -194,11 +189,13 @@ class GraficoBarras extends JPanel
             g.drawString(String.valueOf(hombres[i]), x + 5, height - 30 - heightHombres);
             g.drawString(String.valueOf(mujeres[i]), x + 5 + incrementX, height - 30 - heightMujeres);
 
-            g.setColor(Color.BLUE);
+            //g.setColor(new Color(6600182));
+            g.setColor(new Color(4367861));
             g.fillRect(x, height - 30 - heightHombres, incrementX, heightHombres);
             x += incrementX;
 
-            g.setColor(Color.PINK);
+            g.setColor(new Color(15753874));
+            //g.setColor(new Color(16027569));
             g.fillRect(x, height - 30 - heightMujeres, incrementX, heightMujeres);
             x += incrementX * 2;
         }

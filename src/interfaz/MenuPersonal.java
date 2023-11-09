@@ -5,9 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -15,29 +12,23 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import poo.Datos;
 import poo.Personal;
 
@@ -51,21 +42,41 @@ public class MenuPersonal extends JPanel
     private JPanel panelHerramientas;
     private JPanel panelAreaTrabajo;
     private JTabbedPane tabbedPane;
+    
     final String pathImagenes = "src/interfaz/imagenes/";
-    private Formulario formularioRegistro;
-    private final JLabel[] iconos = new JLabel[13];
+    
+    private final JLabel[] iconos = new JLabel[9];
+    private final JLabel separador = new JLabel(new ImageIcon(pathImagenes + "separador.png"));
     private JComboBox padecimientos;
+    
+    private enum Herramienta
+    {
+        BUSCAR,
+        GUARDAR,
+        LIMPIAR,
+        ACTUALIZAR,
+        RESTABLEZER,
+        ORDENAR,
+        AMBOS,
+        HOMBRE,
+        MUJER,
+        PADECIMIENTO
+    }
+    
+    private FormularioDatos formularioRegistro;
     private JPanel contenedorTabla;
     private JTable tabla;
     private DefaultTableModel model;
     private Datos[] tablaMostrar;
     private boolean tipoOrdenamiento = true;
-    public MenuPersonal()
+    private boolean tipoUsuaurio;
+    
+    public MenuPersonal(boolean tipoUsuario)
     {
         this.setBackground(Color.WHITE);
         this.setLayout(new BorderLayout());
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
-
+        this.tipoUsuaurio = tipoUsuario;
         initPanelNorth();
         initPanelSouth();
 
@@ -85,29 +96,64 @@ public class MenuPersonal extends JPanel
         padecimientos = new JComboBox(new String[] {"","Desnutricion", "Sobrepeso", "Alergias", "Obesidad", "Diabetes", "Otra"});
         String[] txt =
         {
-            "Guardar", "Limpiar", "Buscar Registro", "Actualizar Registro", "Restablecer Registro", "Ordenar Ascendente", "Ordenar Descendente", "Ordenar Clave Ascendente", "Ordenar Clave Descendente", "Ambos", "Hombre", "Mujer", "Limpiar Filtros"
+            "Buscar Registro", "Guardar Registro", "Limpiar Formulario", "Actualizar Registro", "Restablecer Registro", "Ordenar Frecuencia Descendente", "Mostar Ambos", "Mostrar Hombres", "mostrar Mujeres"
         };
-        String[] normal =
+        String[] nomIcon =
         {
-            "guardar.png", "limpiar.png", "buscar_registro.png", "actualizar.png", "restablecer.png", "ordenar_a-z.png", "ordenar_z-a.png", "ordenar_1-9.png", "ordenar_9-1.png", "ambos.png", "hombre.png", "mujer.png", "fitros.png"
+            "buscar_registro.png", "guardar.png", "limpiar.png", "actualizar.png", "restablecer.png", "ordenar.png", "ambos.png", "hombre.png", "mujer.png"
         };
         //String[] hover = {"guardar_Hover.png", "limpiar_Hover.png", "buscar_registro_Hover.png", "actualizar_Hover.png", "restablecer_Hover.png", "ordenar_a-z_Hover.png"};
-        initHerramientas(txt, normal);
-
-        iconos[0].addMouseListener(new MouseAdapter()
+        
+        initHerramientas(txt, nomIcon);
+        habilitarHerraminetas(iconos[1], iconos[2]);
+        separador.setVisible(false);
+        padecimientos.setVisible(false);
+        panelHerramientas.add(padecimientos);
+        
+        /**
+         * Configuara cada herramienta de la barra de herramientas
+         */
+        iconos[Herramienta.BUSCAR.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[0].setIcon(new ImageIcon(pathImagenes + normal[0]));
+                iconos[0].setIcon(new ImageIcon(pathImagenes + nomIcon[0]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[0].setIcon(new ImageIcon(pathImagenes + "guardar_Hover.png"));
+                iconos[0].setIcon(new ImageIcon(pathImagenes + "buscar_registro_Hover.png"));
             }
-
+            @Override
+            public void mouseClicked(MouseEvent evt)
+            {
+                if(iconos[0].isEnabled())
+                {
+                    int[] index = buscarNombre(JOptionPane.showInputDialog("Ingrese nombre"));
+                    if(index != null)
+                    {
+                        tabla.setRowSelectionInterval(index[0], index[0]);
+                    }else
+                    {
+                        JOptionPane.showMessageDialog(null,"El dato ingresado no se ha encontrado en los registro");
+                    }
+                }
+            }
+        });
+        
+        iconos[Herramienta.GUARDAR.ordinal()].addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseExited(MouseEvent evt)
+            {
+                iconos[1].setIcon(new ImageIcon(pathImagenes + nomIcon[1]));
+            }
+            @Override
+            public void mouseEntered(MouseEvent evt)
+            {
+                iconos[1].setIcon(new ImageIcon(pathImagenes + "guardar_Hover.png"));
+            }
             @Override
             public void mouseClicked(MouseEvent evt)
             {
@@ -131,114 +177,84 @@ public class MenuPersonal extends JPanel
                 guardarNuevoRegistro();
             }
         });
-        iconos[1].addMouseListener(new MouseAdapter()
+        iconos[Herramienta.LIMPIAR.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[1].setIcon(new ImageIcon(pathImagenes + normal[1]));
+                iconos[2].setIcon(new ImageIcon(pathImagenes + nomIcon[2]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[1].setIcon(new ImageIcon(pathImagenes + "limpiar_Hover.png"));
+                iconos[2].setIcon(new ImageIcon(pathImagenes + "limpiar_Hover.png"));
             }
-
-            @Override
-            public void mouseClicked(MouseEvent evt)
-            {
-                formularioRegistro.limpiarFormulario();
-            }
-        });
-        iconos[2].addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mouseExited(MouseEvent evt)
-            {
-                iconos[2].setIcon(new ImageIcon(pathImagenes + normal[2]));
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent evt)
-            {
-                iconos[2].setIcon(new ImageIcon(pathImagenes + "buscar_registro_Hover.png"));
-            }
-
             @Override
             public void mouseClicked(MouseEvent evt)
             {
                 if(iconos[2].isEnabled())
                 {
-                    int[] index = buscarNombre(JOptionPane.showInputDialog("Ingrese nombre"));
-                    if(index != null)
-                    {
-                        
-                        //tabla.removeAll();
-                        //model.setRowCount(0);
-                        //llenarTabla(tablaMostrar);
-                        tabla.setRowSelectionInterval(index[0], index[0]);
-                    }else
-                    {
-                        JOptionPane.showMessageDialog(null,"El dato ingresado no se ha encontrado en los registro");
-                    }
+                    formularioRegistro.limpiarFormulario();                    
                 }
             }
         });
-        iconos[3].addMouseListener(new MouseAdapter()
+        
+        iconos[Herramienta.ACTUALIZAR.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[3].setIcon(new ImageIcon(pathImagenes + normal[3]));
+                iconos[3].setIcon(new ImageIcon(pathImagenes + nomIcon[3]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[3].setIcon(new ImageIcon(pathImagenes + "actualizar_Hover.png"));
             }
-
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                if(iconos[3].isEnabled())
+                {
+                    formularioRegistro.limpiarFormulario();                    
+                }
             }
         });
-        iconos[4].addMouseListener(new MouseAdapter()
+        
+        iconos[Herramienta.RESTABLEZER.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[4].setIcon(new ImageIcon(pathImagenes + normal[4]));
+                iconos[4].setIcon(new ImageIcon(pathImagenes + nomIcon[4]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[4].setIcon(new ImageIcon(pathImagenes + "restablecer_Hover.png"));
             }
-
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                if(iconos[4].isEnabled())
+                {
+                    formularioRegistro.limpiarFormulario();                    
+                }
             }
         });
-        iconos[5].addMouseListener(new MouseAdapter()
+        
+        iconos[Herramienta.ORDENAR.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[5].setIcon(new ImageIcon(pathImagenes + normal[5]));
+                iconos[5].setIcon(new ImageIcon(pathImagenes + nomIcon[5]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[5].setIcon(new ImageIcon(pathImagenes + "ordenar_a-z_Hover.png"));
+                iconos[5].setIcon(new ImageIcon(pathImagenes + "ordenar_Hover.png"));
             }
-
             @Override
             public void mouseClicked(MouseEvent evt)
             {
@@ -268,60 +284,57 @@ public class MenuPersonal extends JPanel
                 }
             }
         });
-        iconos[6].addMouseListener(new MouseAdapter()
+        
+        iconos[Herramienta.AMBOS.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[6].setIcon(new ImageIcon(pathImagenes + normal[6]));
+                iconos[6].setIcon(new ImageIcon(pathImagenes + nomIcon[6]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[6].setIcon(new ImageIcon(pathImagenes + "ordenar_z-a_Hover.png"));
+                iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
             }
-
             @Override
             public void mouseClicked(MouseEvent evt)
             {
                 //activarMenu(Menu.INICIO);
             }
         });
-        iconos[7].addMouseListener(new MouseAdapter()
+        
+        iconos[Herramienta.HOMBRE.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[7].setIcon(new ImageIcon(pathImagenes + normal[7]));
+                iconos[7].setIcon(new ImageIcon(pathImagenes + nomIcon[7]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[7].setIcon(new ImageIcon(pathImagenes + "ordenar_1-9_Hover.png"));
+                iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre_Hover.png"));
             }
-
             @Override
             public void mouseClicked(MouseEvent evt)
             {
                 //activarMenu(Menu.INICIO);
             }
         });
-        iconos[8].addMouseListener(new MouseAdapter()
+        
+        iconos[Herramienta.MUJER.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[8].setIcon(new ImageIcon(pathImagenes + normal[8]));
+                iconos[8].setIcon(new ImageIcon(pathImagenes + nomIcon[8]));
             }
-
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[8].setIcon(new ImageIcon(pathImagenes + "ordenar_9-1_Hover.png"));
+                iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
             }
-            
             @Override
             public void mouseClicked(MouseEvent evt)
             {
@@ -329,118 +342,16 @@ public class MenuPersonal extends JPanel
                     JOptionPane.showMessageDialog(null, "Hola");
             }
         });
-        iconos[9].addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mouseExited(MouseEvent evt)
-            {
-                iconos[9].setIcon(new ImageIcon(pathImagenes + normal[9]));
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent evt)
-            {
-                iconos[9].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent evt)
-            {
-                if(iconos[9].isEnabled())
-                    JOptionPane.showMessageDialog(null, "Hola");
-            }
-        });
-        iconos[10].addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mouseExited(MouseEvent evt)
-            {
-                iconos[10].setIcon(new ImageIcon(pathImagenes + normal[10]));
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent evt)
-            {
-                iconos[10].setIcon(new ImageIcon(pathImagenes + "hombre_Hover.png"));
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent evt)
-            {
-                if(iconos[10].isEnabled())
-                    JOptionPane.showMessageDialog(null, "Hola");
-            }
-        });
-        iconos[11].addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mouseExited(MouseEvent evt)
-            {
-                iconos[11].setIcon(new ImageIcon(pathImagenes + normal[11]));
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent evt)
-            {
-                iconos[11].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent evt)
-            {
-                if(iconos[11].isEnabled())
-                    JOptionPane.showMessageDialog(null, "Hola");
-            }
-        });
-        iconos[12].addMouseListener(new MouseAdapter()
-        {
-            @Override
-            public void mouseExited(MouseEvent evt)
-            {
-                iconos[12].setIcon(new ImageIcon(pathImagenes + normal[12]));
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent evt)
-            {
-                iconos[12].setIcon(new ImageIcon(pathImagenes + "fitros_Hover.png"));
-            }
-            
-            @Override
-            public void mouseClicked(MouseEvent evt)
-            {
-                if(iconos[12].isEnabled())
-                    JOptionPane.showMessageDialog(null, "Hola");
-            }
-        });
-
-        habilitarHerraminetas(iconos[0], iconos[1]);
-        padecimientos.setVisible(false);
-        panelHerramientas.add(iconos[0]);
-        panelHerramientas.add(iconos[1]);
-        panelHerramientas.add(iconos[2]);
-        panelHerramientas.add(iconos[3]);
-        panelHerramientas.add(iconos[4]);
-        panelHerramientas.add(iconos[5]);
-        //panelHerramientas.add(iconos[6]);
-        //panelHerramientas.add(iconos[7]);
-        //panelHerramientas.add(iconos[8]);
-        panelHerramientas.add(iconos[9]);
-        panelHerramientas.add(iconos[10]);
-        panelHerramientas.add(iconos[11]);
-        panelHerramientas.add(padecimientos);
-        //panelHerramientas.add(iconos[12]);
     }
 
     private void initPanelSouth()
     {
-        tabbedPane = new JTabbedPane();
         panelAreaTrabajo = new JPanel();
         panelAreaTrabajo.setBackground(Color.WHITE);
         panelAreaTrabajo.setBorder(new EmptyBorder(20, 0, 0, 0));
         panelAreaTrabajo.setLayout(new BorderLayout());
-        //panelAreaTrabajo.setLayout(new FlowLayout());
-
+        tabbedPane = new JTabbedPane();
+        
         initPanelRegistrar();
         initPanelModificar();
         initPanelConsultar();
@@ -452,37 +363,40 @@ public class MenuPersonal extends JPanel
             {
                 int selectedIndex = tabbedPane.getSelectedIndex();
                 padecimientos.setVisible(false);
+                separador.setVisible(false);
                 switch (selectedIndex)
                 {
                     case 0:
-                    case 3:
-                        habilitarHerraminetas(iconos[0], iconos[1]);
+                        habilitarHerraminetas(iconos[1], iconos[2]);
                         break;
                     case 1:
-                        habilitarHerraminetas(iconos[3], iconos[4]);
-
+                        habilitarHerraminetas(iconos[0], iconos[3], iconos[4]);
                         break;
                     case 2:
+                        habilitarHerraminetas(iconos[0], iconos[5], iconos[6], iconos[7], iconos[8]);
+                        separador.setVisible(true);
                         padecimientos.setVisible(true);
-                        habilitarHerraminetas(iconos[2], iconos[5], iconos[6], iconos[7], iconos[8],iconos[9], iconos[10], iconos[11], iconos[12]);
                        // contenedorTabla.removeAll();
                         Datos[] lista = (Datos[]) ManipulacionArchivos.cargaArch(contenedorTabla, "personal.dat", false);        
-                        if(lista == null)
+                        ctrl.CtrlInterfaz.habilita( (lista != null), iconos[0], iconos[5], iconos[6], iconos[7], iconos[8]);
+                        if(lista != null)
                         {
-                            //iconos[8].setEnabled(false);
-                            ctrl.CtrlInterfaz.habilita(false, iconos[5],iconos[6], iconos[7], iconos[8], iconos[9], iconos[10], iconos[11], padecimientos, iconos [12]);
-                        }else
-                        {
-                            ctrl.CtrlInterfaz.habilita(true, iconos[5],iconos[6], iconos[7], iconos[8], iconos[9], iconos[10], iconos[11], padecimientos, iconos [12]);
+                            ctrl.CtrlInterfaz.habilita(true, iconos[0], iconos[5], iconos[6], iconos[7], iconos[8]);
                             model.setRowCount(0);
                             contenedorTabla.add(llenarTabla(lista), BorderLayout.CENTER);
                         }
-                        
                         break;
+                    case 3:
+                        habilitarHerraminetas(iconos[0], iconos[1], iconos[2]);
                 }
             }
         });
 
+        /**
+         * Configuracion de los atajos de teclado para moverse por las pestañas
+         * Ctrl + 1 => Nuevo Registro : Ctrl + 2  => Modificar Registro 
+         * Ctrl + 3 => Consultar Registros : Ctrl + 4 => Nueva Consulta Medica.
+         */
         KeyStroke keyCtrl1 = KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke keyCtrl2 = KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke keyCtrl3 = KeyStroke.getKeyStroke(KeyEvent.VK_3, KeyEvent.CTRL_DOWN_MASK);
@@ -536,17 +450,25 @@ public class MenuPersonal extends JPanel
     private void initPanelRegistrar()
     {
         JPanel contenedor = new JPanel();
-        formularioRegistro = new Formulario(true);
+        JPanel contenedor1 = new JPanel();
         JPanel contenedor2 = new JPanel();
+        formularioRegistro = new FormularioDatos(tipoUsuaurio);
+        //contenedor.setLayout(new FlowLayout(FlowLayout.CENTER));
+        //contenedor1.setBackground(Color.WHITE);
+        contenedor1.add(formularioRegistro);
 
         JButton btnCancelar = new JButton("Cancelar");
+        JButton btnGuardar = new JButton("Guardar Registro");
+        //contenedor2.setBackground(Color.WHITE);
         contenedor2.add(btnCancelar);
-        JButton btnGuardar = new JButton("Guardar");
         contenedor2.add(btnGuardar);
 
         contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
-        contenedor.add(formularioRegistro);
+        //contenedor.setBackground(Color.WHITE);
+        contenedor.add(contenedor1);
+        //contenedor.add(Box.createHorizontalGlue());
         contenedor.add(contenedor2);
+        //contenedor.add(Box.createHorizontalGlue());
         tabbedPane.addTab("Nuevo Registro", null, contenedor);
 
         btnGuardar.addActionListener(new ActionListener()
@@ -570,53 +492,35 @@ public class MenuPersonal extends JPanel
 
     private void initPanelModificar()
     {
-        JPanel conten = new JPanel();
-        conten.setLayout(new BoxLayout(conten, BoxLayout.X_AXIS));
-        JPanel contenedor = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        Formulario formulario = new Formulario(true);
-        formulario.habilitarComponentes(false);
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        contenedor.add(new JLabel("Clave"), gbc);
-        gbc.gridx = 1;
-        contenedor.add(new JTextField(10), gbc);
-        gbc.gridy = 1;
-        JButton btnBuscar = new JButton("Buscar");
-        contenedor.add(btnBuscar, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        JSeparator separator = new JSeparator(SwingConstants.VERTICAL);
-        conten.add(contenedor);
-        conten.add(separator);
-
+        JPanel contenedor = new JPanel();
+        JPanel contenedor1 = new JPanel();
         JPanel contenedor2 = new JPanel();
-        JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setEnabled(false);
-        contenedor2.add(btnCancelar);
-        JButton btnGuardar = new JButton("Guardar");
-        btnGuardar.setEnabled(false);
+        formularioRegistro = new FormularioDatos(tipoUsuaurio);
+        //contenedor.setLayout(new FlowLayout(FlowLayout.CENTER));
+        //contenedor1.setBackground(Color.WHITE);
+        contenedor1.add(formularioRegistro);
+
+        JButton btnGuardar = new JButton("Actualizar Registro");
+        //contenedor2.setBackground(Color.WHITE);
         contenedor2.add(btnGuardar);
 
-        JPanel contenedor3 = new JPanel();
-        contenedor3.setLayout(new BoxLayout(contenedor3, BoxLayout.Y_AXIS));
-        contenedor3.add(formulario);
-        contenedor3.add(contenedor2);
-        conten.add(contenedor3);
-        tabbedPane.addTab("Modificar Registros", null, conten);
+        contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
+        //contenedor.setBackground(Color.WHITE);
+        contenedor.add(contenedor1);
+        //contenedor.add(Box.createHorizontalGlue());
+        contenedor.add(contenedor2);
+        //contenedor.add(Box.createHorizontalGlue());
+        tabbedPane.addTab("Nuevo Registro", null, contenedor);
 
-        btnBuscar.addActionListener(new ActionListener()
+        btnGuardar.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                formulario.habilitarComponentes(true);
-                btnGuardar.setEnabled(true);
-                btnCancelar.setEnabled(true);
+                guardarNuevoRegistro();
             }
-        });
+        }
+        );
     }
 
     private void initPanelConsultar()
@@ -640,7 +544,41 @@ public class MenuPersonal extends JPanel
 
     private void initConsultaMedica()
     {
-        JPanel conten = new JPanel();
+        JPanel contenedor = new JPanel();
+        JPanel contenedor1 = new JPanel();
+        JPanel contenedor2 = new JPanel();
+        JPanel contenedor3 = new JPanel();
+        formularioRegistro = new FormularioDatos(tipoUsuaurio);
+        FormularioMedico formularioMedico = new FormularioMedico();
+        //contenedor.setLayout(new FlowLayout(FlowLayout.CENTER));
+        //contenedor1.setBackground(Color.WHITE);
+        formularioMedico.setBorder(BorderFactory.createTitledBorder(""));
+        contenedor1.add(formularioRegistro);
+        contenedor2.add(formularioMedico);
+        
+        JButton btnGuardar = new JButton("Guardar Consulta Medica");
+        //contenedor2.setBackground(Color.WHITE);
+        contenedor3.add(btnGuardar);
+
+        contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
+        //contenedor.setBackground(Color.WHITE);
+        contenedor.add(contenedor1);
+        //contenedor.add(Box.createHorizontalGlue());
+        contenedor.add(contenedor2);
+        contenedor.add(contenedor3);
+        //contenedor.add(Box.createHorizontalGlue());
+        tabbedPane.addTab("Nuevo Registro", null, new JScrollPane(contenedor));
+
+        btnGuardar.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                guardarNuevoRegistro();
+            }
+        }
+        );
+        /*JPanel conten = new JPanel();
         conten.setLayout(new BoxLayout(conten, BoxLayout.X_AXIS));
         JPanel contenedor = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -675,7 +613,7 @@ public class MenuPersonal extends JPanel
         contenedor3.add(formulario);
         contenedor3.add(contenedor2);
         conten.add(contenedor3);
-        tabbedPane.addTab("Consulta Medica", null, conten);
+        tabbedPane.addTab("Nueva Consulta Medica", null, conten);
 
         btnBuscar.addActionListener(new ActionListener()
         {
@@ -686,20 +624,29 @@ public class MenuPersonal extends JPanel
                 btnGuardar.setEnabled(true);
                 btnCancelar.setEnabled(true);
             }
-        });
+        });*/
     }
 
-    private void initHerramientas(String[] txt, String[] normal)
+    /**
+     * inicializa los iconos de la barra de herramientas
+     * @param txt se asigna como setToolTipText
+     * @param nomIcon contiene el nombre del icono de la herramienta 
+     */
+    private void initHerramientas(String[] txt, String[] nomIcon)
     {
-        if (txt.length == normal.length && normal.length == iconos.length)
+        if (txt.length == nomIcon.length && nomIcon.length == iconos.length)
         {
+            ImageIcon img;
             for (int i = 0; i < txt.length; i++)
             {
-                ImageIcon img = new ImageIcon(pathImagenes + "" + normal[i]);
+                img = new ImageIcon(pathImagenes + "" + nomIcon[i]);
                 iconos[i].setIcon(img);
                 iconos[i].setBorder(new EmptyBorder(0, 0, 0, 5));
                 iconos[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
                 iconos[i].setToolTipText(txt[i]);
+                if (i == 6)
+                    panelHerramientas.add(separador);
+                panelHerramientas.add(iconos[i]);
             }
         }
     }
@@ -736,7 +683,7 @@ public class MenuPersonal extends JPanel
                 Datos personal = new Personal(formularioRegistro.getEstatus().getSelectedIndex(),
                         formularioRegistro.getCve().getText(), formularioRegistro.getNombre().getText(),
                         formularioRegistro.getPrimerAp().getText(),formularioRegistro.getSegundoAp().getText(), 
-                        (formularioRegistro.getRadioButton1().isSelected()) ? 'H':'M', 
+                        (formularioRegistro.getRbtMasculino().isSelected()) ? 'H':'M', 
                         formularioRegistro.getDesnutricion().isSelected(), formularioRegistro.getSobrepeso().isSelected(),
                         formularioRegistro.getAlergias().isSelected(), formularioRegistro.getObesidad().isSelected(), 
                         formularioRegistro.getDiabetes().isSelected(), formularioRegistro.getOtrasCual().getText());
