@@ -83,14 +83,15 @@ public class MenuEstudiantes extends JPanel
     
     private void initPanelRegistrar()
     {
-        
-        FormularioDatos formulario = new FormularioDatos(false);
         JPanel contenedor2 = new JPanel();
-        
         JButton btnCancelar = new JButton("Cancelar");
-        contenedor2.add(btnCancelar);
         JButton btnGuardar = new JButton("Guardar");
         contenedor2.add(btnGuardar);
+        contenedor2.add(btnCancelar);
+        FormularioDatos formulario = new FormularioDatos(false, btnGuardar);
+        
+        
+        
         
         //contenedor.setLayout(new BoxLayout(contenedor,BoxLayout.Y_AXIS));
         

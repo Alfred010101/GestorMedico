@@ -29,6 +29,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import poo.Alumnos;
 import poo.Datos;
 import poo.Personal;
 
@@ -36,19 +37,30 @@ import poo.Personal;
  *
  * @author alfredo
  */
-public class MenuPersonal extends JPanel
+public class MenuPersonal extends JPanel implements EstadoInicial
 {
 
     private JPanel panelHerramientas;
     private JPanel panelAreaTrabajo;
     private JTabbedPane tabbedPane;
     
-    final String pathImagenes = "src/interfaz/imagenes/";
-    
+
+    private final String pathImagenes = "src/interfaz/imagenes/";
+
     private final JLabel[] iconos = new JLabel[9];
     private final JLabel separador = new JLabel(new ImageIcon(pathImagenes + "separador.png"));
-    private JComboBox padecimientos;
-    
+    private final JComboBox padecimientos = new JComboBox(new String[]
+    {
+        "", "Desnutricion", "Sobrepeso", "Alergias", "Obesidad", "Diabetes", "Otra"
+    });
+
+    @Override
+    public void restablecerEstadoInicial()
+    {
+        tabbedPane.setSelectedIndex(0);
+        formRegistro.limpiarFormulario();
+    }
+
     private enum Herramienta
     {
         BUSCAR,
@@ -62,21 +74,33 @@ public class MenuPersonal extends JPanel
         MUJER,
         PADECIMIENTO
     }
-    
-    private FormularioDatos formularioRegistro;
+
+    private FormularioDatos formRegistro;
+    private FormularioDatos formModificar;
+    private FormularioDatos formDatos;
+    private FormularioMedico formularioMedico;
     private JPanel contenedorTabla;
-    private JTable tabla;
     private DefaultTableModel model;
-    private Datos[] tablaMostrar;
+    private JTable tabla;
+    private JScrollPane scrollTabla;
+
+    private JButton btnGuardarCambios;
+    private Datos[] listaActualMostrar;
+    private Datos[] arrayCompletoRegistros;
     private boolean tipoOrdenamiento = true;
-    private boolean tipoUsuaurio;
-    
+    private final boolean tipoUsuaurio;
+    private int indexRegistro;
+    private int filtros;
+            
     public MenuPersonal(boolean tipoUsuario)
     {
         this.setBackground(Color.WHITE);
         this.setLayout(new BorderLayout());
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
         this.tipoUsuaurio = tipoUsuario;
+
+        arrayCompletoRegistros = (Datos[]) ctrl.ManipulacionArchivos.cargaArch("datos.dat");
+
         initPanelNorth();
         initPanelSouth();
 
@@ -92,8 +116,7 @@ public class MenuPersonal extends JPanel
         {
             iconos[i] = new JLabel();
         }
-        
-        padecimientos = new JComboBox(new String[] {"","Desnutricion", "Sobrepeso", "Alergias", "Obesidad", "Diabetes", "Otra"});
+
         String[] txt =
         {
             "Buscar Registro", "Guardar Registro", "Limpiar Formulario", "Actualizar Registro", "Restablecer Registro", "Ordenar Frecuencia Descendente", "Mostar Ambos", "Mostrar Hombres", "mostrar Mujeres"
@@ -103,15 +126,15 @@ public class MenuPersonal extends JPanel
             "buscar_registro.png", "guardar.png", "limpiar.png", "actualizar.png", "restablecer.png", "ordenar.png", "ambos.png", "hombre.png", "mujer.png"
         };
         //String[] hover = {"guardar_Hover.png", "limpiar_Hover.png", "buscar_registro_Hover.png", "actualizar_Hover.png", "restablecer_Hover.png", "ordenar_a-z_Hover.png"};
-        
+
         initHerramientas(txt, nomIcon);
-        habilitarHerraminetas(iconos[1], iconos[2]);
+        verHerramientas(iconos[1], iconos[2]);
         separador.setVisible(false);
         padecimientos.setVisible(false);
         panelHerramientas.add(padecimientos);
-        
+
         /**
-         * Configuara cada herramienta de la barra de herramientas
+         * Configuara cada herramienta de la barra de herramientas.
          */
         iconos[Herramienta.BUSCAR.ordinal()].addMouseListener(new MouseAdapter()
         {
@@ -120,28 +143,64 @@ public class MenuPersonal extends JPanel
             {
                 iconos[0].setIcon(new ImageIcon(pathImagenes + nomIcon[0]));
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[0].setIcon(new ImageIcon(pathImagenes + "buscar_registro_Hover.png"));
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                if(iconos[0].isEnabled())
+                if (iconos[0].isEnabled())
                 {
-                    int[] index = buscarNombre(JOptionPane.showInputDialog("Ingrese nombre"));
-                    if(index != null)
+                    arrayCompletoRegistros = (Datos[]) ctrl.ManipulacionArchivos.cargaArch("datos.dat");
+                    switch (tabbedPane.getSelectedIndex())
                     {
-                        tabla.setRowSelectionInterval(index[0], index[0]);
-                    }else
-                    {
-                        JOptionPane.showMessageDialog(null,"El dato ingresado no se ha encontrado en los registro");
+                        case 1:
+                            indexRegistro = buscarRegistroModificar(arrayCompletoRegistros, formModificar);
+                            
+                            ctrl.CtrlInterfaz.habilita((indexRegistro >= 0), formModificar.getEstatus(), formModificar.getDesnutricion(), formModificar.getSobrepeso(), formModificar.getAlergias(), formModificar.getObesidad(), formModificar.getDiabetes(), formModificar.getOtras());
+                            ctrl.CtrlInterfaz.habilita((indexRegistro >= 0), btnGuardarCambios, iconos[3], iconos[4]);
+                            if (!tipoUsuaurio)
+                            {
+                                ctrl.CtrlInterfaz.habilita((indexRegistro >= 0), formModificar.getViveCon());
+                            }    
+                            
+                            if(indexRegistro < 0)
+                            {
+                                formModificar.limpiarFormulario();
+                                formModificar.getCve().setEnabled(false);
+                            }
+                            break;
+                        case 2:
+                            indexRegistro = buscarRegistroModificar(arrayCompletoRegistros, null);
+                            if(indexRegistro >= 0)
+                            {
+                                padecimientos.setSelectedIndex(0);
+                                iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+                                iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre.png"));
+                                iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer.png"));
+                                filtros = 0;
+                                filtrar(arrayCompletoRegistros, filtros, padecimientos.getSelectedIndex(), tipoUsuaurio);
+                                selectRow(tabla, 0, arrayCompletoRegistros[indexRegistro].getCve());
+                            }   break;
+                        case 3:
+                            indexRegistro = buscarRegistroModificar(arrayCompletoRegistros, formDatos);
+                            if(indexRegistro >= 0)
+                            {
+                                ctrl.CtrlInterfaz.habilita(true, iconos[1], iconos[2]);
+                            }else
+                            {
+                                formRegistro.limpiarFormulario();
+                            }
+                            break;
                     }
                 }
             }
         });
-        
+
         iconos[Herramienta.GUARDAR.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
@@ -149,16 +208,18 @@ public class MenuPersonal extends JPanel
             {
                 iconos[1].setIcon(new ImageIcon(pathImagenes + nomIcon[1]));
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[1].setIcon(new ImageIcon(pathImagenes + "guardar_Hover.png"));
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
                 //JDialog customDialog = new JDialog(new JFrame(), "Ventana Emergente", true);
-               /* VentanaEmergente customDialog = new VentanaEmergente(new JFrame(), "Buscar Registro");
+                /* VentanaEmergente customDialog = new VentanaEmergente(new JFrame(), "Buscar Registro");
 
                 customDialog.setSize(500, 200);
                 customDialog.setLocationRelativeTo(null);
@@ -174,7 +235,7 @@ public class MenuPersonal extends JPanel
 
                 // Mostrar el JDialog
                 customDialog.setVisible(true);*/
-                guardarNuevoRegistro();
+                //guardarNuevoRegistro();
             }
         });
         iconos[Herramienta.LIMPIAR.ordinal()].addMouseListener(new MouseAdapter()
@@ -184,21 +245,30 @@ public class MenuPersonal extends JPanel
             {
                 iconos[2].setIcon(new ImageIcon(pathImagenes + nomIcon[2]));
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[2].setIcon(new ImageIcon(pathImagenes + "limpiar_Hover.png"));
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                if(iconos[2].isEnabled())
+                if (iconos[2].isEnabled())
                 {
-                    formularioRegistro.limpiarFormulario();                    
+                    if (tabbedPane.getSelectedIndex() == 0)
+                    {
+                        formRegistro.limpiarFormulario();
+                    } else if (tabbedPane.getSelectedIndex() == 3)
+                    {
+
+                    }
+
                 }
             }
         });
-        
+
         iconos[Herramienta.ACTUALIZAR.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
@@ -206,21 +276,23 @@ public class MenuPersonal extends JPanel
             {
                 iconos[3].setIcon(new ImageIcon(pathImagenes + nomIcon[3]));
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[3].setIcon(new ImageIcon(pathImagenes + "actualizar_Hover.png"));
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                if(iconos[3].isEnabled())
+                if (iconos[3].isEnabled())
                 {
-                    formularioRegistro.limpiarFormulario();                    
+                    guardarCambiosRegistro(formModificar, arrayCompletoRegistros, tipoUsuaurio, indexRegistro);             
                 }
             }
         });
-        
+
         iconos[Herramienta.RESTABLEZER.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
@@ -228,21 +300,23 @@ public class MenuPersonal extends JPanel
             {
                 iconos[4].setIcon(new ImageIcon(pathImagenes + nomIcon[4]));
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[4].setIcon(new ImageIcon(pathImagenes + "restablecer_Hover.png"));
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                if(iconos[4].isEnabled())
+                if (iconos[4].isEnabled() && arrayCompletoRegistros != null && indexRegistro < arrayCompletoRegistros.length && indexRegistro >= 0)
                 {
-                    formularioRegistro.limpiarFormulario();                    
+                    mostrarDatosModificar(arrayCompletoRegistros[indexRegistro], formModificar);                   
                 }
             }
         });
-        
+
         iconos[Herramienta.ORDENAR.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
@@ -250,96 +324,171 @@ public class MenuPersonal extends JPanel
             {
                 iconos[5].setIcon(new ImageIcon(pathImagenes + nomIcon[5]));
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
                 iconos[5].setIcon(new ImageIcon(pathImagenes + "ordenar_Hover.png"));
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                if(iconos[5].isEnabled() && tablaMostrar != null)
+                if (iconos[5].isEnabled() && listaActualMostrar != null)
                 {
                     Datos tmp;
-                    for (int i = 0; i < tablaMostrar.length; i++)
+                    for (int i = 0; i < listaActualMostrar.length; i++)
                     {
-                        for (int j = 0; j < tablaMostrar.length - 1; j++)
+                        for (int j = 0; j < listaActualMostrar.length - 1; j++)
                         {
-                            if(tipoOrdenamiento && tablaMostrar[j].getNom().compareTo(tablaMostrar[j + 1].getNom()) > 0)
+                            if (tipoOrdenamiento && listaActualMostrar[j].getNom().compareTo(listaActualMostrar[j + 1].getNom()) > 0)
                             {
-                                tmp = tablaMostrar[j];
-                                tablaMostrar[j] = tablaMostrar[j +1];
-                                tablaMostrar[j + 1] =  tmp;
-                            }else if(!tipoOrdenamiento && tablaMostrar[j].getNom().compareTo(tablaMostrar[j + 1].getNom()) < 0)
+                                tmp = listaActualMostrar[j];
+                                listaActualMostrar[j] = listaActualMostrar[j + 1];
+                                listaActualMostrar[j + 1] = tmp;
+                            } else if (!tipoOrdenamiento && listaActualMostrar[j].getNom().compareTo(listaActualMostrar[j + 1].getNom()) < 0)
                             {
-                                tmp = tablaMostrar[j];
-                                tablaMostrar[j] = tablaMostrar[j +1];
-                                tablaMostrar[j + 1] =  tmp;
+                                tmp = listaActualMostrar[j];
+                                listaActualMostrar[j] = listaActualMostrar[j + 1];
+                                listaActualMostrar[j + 1] = tmp;
                             }
                         }
                     }
                     tipoOrdenamiento = (!tipoOrdenamiento);
                     model.setRowCount(0);
-                    llenarTabla(tablaMostrar);
+                    llenarTabla(listaActualMostrar, tipoUsuaurio);
                 }
             }
         });
-        
+
         iconos[Herramienta.AMBOS.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[6].setIcon(new ImageIcon(pathImagenes + nomIcon[6]));
+                if(filtros != 0)
+                {
+                    iconos[6].setIcon(new ImageIcon(pathImagenes + nomIcon[6]));
+                }                
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+                if(filtros != 0)
+                {
+                    iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+                }
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                if(iconos[6].isEnabled() && filtros != 0)
+                {
+                    switch (filtros)
+                    {
+                        case 1:
+                            iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre.png"));
+                            break;
+                        case 2:
+                            iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer.png"));
+                    }
+                    iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+                    filtros = 0;
+                    filtrar(arrayCompletoRegistros, filtros, padecimientos.getSelectedIndex(), tipoUsuaurio);                  
+                }
             }
         });
-        
+
         iconos[Herramienta.HOMBRE.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[7].setIcon(new ImageIcon(pathImagenes + nomIcon[7]));
+                if(filtros != 1)
+                {
+                    iconos[7].setIcon(new ImageIcon(pathImagenes + nomIcon[7]));
+                }
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre_Hover.png"));
+                if(filtros != 1)
+                {
+                    iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre_Hover.png"));
+                }
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //activarMenu(Menu.INICIO);
+                if(iconos[7].isEnabled() && filtros != 1)
+                {
+                    //activarMenu(Menu.INICIO);
+                    switch (filtros)
+                    {
+                        case 0:
+                            iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos.png"));
+                            break;
+                        case 2:
+                            iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer.png"));
+                    }
+                    iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre_Hover.png"));                            
+                    filtros = 1;
+                    filtrar(arrayCompletoRegistros, filtros, padecimientos.getSelectedIndex(), tipoUsuaurio);
+                }
             }
         });
-        
+
         iconos[Herramienta.MUJER.ordinal()].addMouseListener(new MouseAdapter()
         {
             @Override
             public void mouseExited(MouseEvent evt)
             {
-                iconos[8].setIcon(new ImageIcon(pathImagenes + nomIcon[8]));
+                if(filtros != 2)
+                {
+                    iconos[8].setIcon(new ImageIcon(pathImagenes + nomIcon[8]));
+                }
             }
+
             @Override
             public void mouseEntered(MouseEvent evt)
             {
-                iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
+                if(filtros != 2)
+                {
+                    iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
+                }
             }
+
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                if(iconos[8].isEnabled())
-                    JOptionPane.showMessageDialog(null, "Hola");
+                if (iconos[8].isEnabled() && filtros != 2)
+                {
+//                    iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
+//                    JOptionPane.showMessageDialog(null, "Hola");
+//                    filtros[0] = 2;
+                    switch (filtros)
+                    {
+                        case 0:
+                            iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos.png"));
+                            break;
+                        case 1:
+                            iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre.png"));
+                    }                           
+                    iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
+                    filtros = 2;
+                    filtrar(arrayCompletoRegistros, filtros, padecimientos.getSelectedIndex(), tipoUsuaurio);
+                }
+            }
+        });
+        
+        padecimientos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                filtrar(arrayCompletoRegistros, filtros, padecimientos.getSelectedIndex(), tipoUsuaurio);
             }
         });
     }
@@ -351,7 +500,7 @@ public class MenuPersonal extends JPanel
         panelAreaTrabajo.setBorder(new EmptyBorder(20, 0, 0, 0));
         panelAreaTrabajo.setLayout(new BorderLayout());
         tabbedPane = new JTabbedPane();
-        
+
         initPanelRegistrar();
         initPanelModificar();
         initPanelConsultar();
@@ -367,35 +516,69 @@ public class MenuPersonal extends JPanel
                 switch (selectedIndex)
                 {
                     case 0:
-                        habilitarHerraminetas(iconos[1], iconos[2]);
+                        verHerramientas(iconos[1], iconos[2]);
+                        ctrl.CtrlInterfaz.habilita(true, iconos[1], iconos[2]);
+                        formRegistro.limpiarFormulario();
                         break;
                     case 1:
-                        habilitarHerraminetas(iconos[0], iconos[3], iconos[4]);
+                        formModificar.limpiarFormulario();
+                        verHerramientas(iconos[0], iconos[3], iconos[4]);
+                        ctrl.CtrlInterfaz.habilita(false, formModificar.getCve(), formModificar.getNombre(), formModificar.getPrimerAp(), formModificar.getSegundoAp());
+                        ctrl.CtrlInterfaz.habilita(false, formModificar.getEstatus(), formModificar.getRbtMasculino(), formModificar.getRbtFemenino());
+                        ctrl.CtrlInterfaz.habilita(false, formModificar.getDesnutricion(), formModificar.getSobrepeso(), formModificar.getAlergias(), formModificar.getObesidad(), formModificar.getDiabetes(), formModificar.getOtras());
+                        ctrl.CtrlInterfaz.habilita(false, btnGuardarCambios, iconos[3], iconos[4]);
+                        ctrl.CtrlInterfaz.habilita(true, iconos[0]);
+                        if (!tipoUsuaurio)
+                        {
+                            ctrl.CtrlInterfaz.habilita(false, formModificar.getViveCon());
+                        }
                         break;
                     case 2:
-                        habilitarHerraminetas(iconos[0], iconos[5], iconos[6], iconos[7], iconos[8]);
+                        verHerramientas(iconos[0], iconos[5], iconos[6], iconos[7], iconos[8]);
                         separador.setVisible(true);
                         padecimientos.setVisible(true);
-                       // contenedorTabla.removeAll();
-                        Datos[] lista = (Datos[]) ManipulacionArchivos.cargaArch(contenedorTabla, "personal.dat", false);        
-                        ctrl.CtrlInterfaz.habilita( (lista != null), iconos[0], iconos[5], iconos[6], iconos[7], iconos[8]);
-                        if(lista != null)
-                        {
-                            ctrl.CtrlInterfaz.habilita(true, iconos[0], iconos[5], iconos[6], iconos[7], iconos[8]);
-                            model.setRowCount(0);
-                            contenedorTabla.add(llenarTabla(lista), BorderLayout.CENTER);
+                        iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+                        iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre.png"));
+                        iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer.png"));
+                        padecimientos.setSelectedIndex(0);
+                        arrayCompletoRegistros = (Datos[]) ManipulacionArchivos.cargaArch(contenedorTabla, "datos.dat");
+                        ctrl.CtrlInterfaz.habilita((arrayCompletoRegistros != null), iconos[0], iconos[5], iconos[6], iconos[7], iconos[8], padecimientos);
+                        if (arrayCompletoRegistros != null)
+                        {                           
+                            iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+                            filtros = 0;
+                            filtrar(arrayCompletoRegistros, filtros, padecimientos.getSelectedIndex(), tipoUsuaurio);
+                            if(model.getRowCount() == 0)
+                            {
+                                ctrl.CtrlInterfaz.habilita(false, iconos[0], iconos[5], iconos[6], iconos[7], iconos[8], padecimientos);
+                                JOptionPane.showMessageDialog(null, "No se han econtrado registros", "Registros Vacios", JOptionPane.WARNING_MESSAGE);
+                            }
                         }
                         break;
                     case 3:
-                        habilitarHerraminetas(iconos[0], iconos[1], iconos[2]);
+                        verHerramientas(iconos[0], iconos[1], iconos[2]);
+                        iconos[0].setEnabled(true);
+                        ctrl.CtrlInterfaz.habilita(false, iconos[1], iconos[2]);
+                        formDatos.getCve().setEditable(false);
+                        formDatos.getNombre().setEditable(false);
+                        formDatos.getPrimerAp().setEditable(false);
+                        formDatos.getSegundoAp().setEditable(false);
+                        formDatos.getOtrasCual().setEditable(false);
+                        ctrl.CtrlInterfaz.habilita(false, formDatos.getEstatus(), formDatos.getRbtMasculino(), formDatos.getRbtFemenino());
+                        ctrl.CtrlInterfaz.habilita(false, formDatos.getDesnutricion(), formDatos.getSobrepeso(), formDatos.getAlergias(), formDatos.getObesidad(), formDatos.getDiabetes(), formDatos.getOtras());
+                        if (!tipoUsuaurio)
+                        {
+                             ctrl.CtrlInterfaz.habilita(false,formDatos.getViveCon());
+                        }
+                        formDatos.limpiarFormulario();
                 }
             }
         });
 
         /**
          * Configuracion de los atajos de teclado para moverse por las pestañas
-         * Ctrl + 1 => Nuevo Registro : Ctrl + 2  => Modificar Registro 
-         * Ctrl + 3 => Consultar Registros : Ctrl + 4 => Nueva Consulta Medica.
+         * Ctrl + 1 => Nuevo Registro : Ctrl + 2 => Modificar Registro Ctrl + 3
+         * => Consultar Registros : Ctrl + 4 => Nueva Consulta Medica.
          */
         KeyStroke keyCtrl1 = KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke keyCtrl2 = KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_DOWN_MASK);
@@ -452,23 +635,18 @@ public class MenuPersonal extends JPanel
         JPanel contenedor = new JPanel();
         JPanel contenedor1 = new JPanel();
         JPanel contenedor2 = new JPanel();
-        formularioRegistro = new FormularioDatos(tipoUsuaurio);
-        //contenedor.setLayout(new FlowLayout(FlowLayout.CENTER));
-        //contenedor1.setBackground(Color.WHITE);
-        contenedor1.add(formularioRegistro);
 
         JButton btnCancelar = new JButton("Cancelar");
         JButton btnGuardar = new JButton("Guardar Registro");
-        //contenedor2.setBackground(Color.WHITE);
+        formRegistro = new FormularioDatos(tipoUsuaurio, btnGuardar);
+
+        contenedor1.add(formRegistro);
         contenedor2.add(btnCancelar);
         contenedor2.add(btnGuardar);
 
         contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
-        //contenedor.setBackground(Color.WHITE);
         contenedor.add(contenedor1);
-        //contenedor.add(Box.createHorizontalGlue());
         contenedor.add(contenedor2);
-        //contenedor.add(Box.createHorizontalGlue());
         tabbedPane.addTab("Nuevo Registro", null, contenedor);
 
         btnGuardar.addActionListener(new ActionListener()
@@ -476,16 +654,19 @@ public class MenuPersonal extends JPanel
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                guardarNuevoRegistro();
+                if (tabbedPane.getSelectedIndex() == 0)
+                {
+                    guardarRegistro(formRegistro, tipoUsuaurio);
+                }
+
             }
-        }
-        );
+        });
         btnCancelar.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                formularioRegistro.limpiarFormulario();
+                formRegistro.limpiarFormulario();
             }
         });
     }
@@ -495,41 +676,44 @@ public class MenuPersonal extends JPanel
         JPanel contenedor = new JPanel();
         JPanel contenedor1 = new JPanel();
         JPanel contenedor2 = new JPanel();
-        formularioRegistro = new FormularioDatos(tipoUsuaurio);
-        //contenedor.setLayout(new FlowLayout(FlowLayout.CENTER));
-        //contenedor1.setBackground(Color.WHITE);
-        contenedor1.add(formularioRegistro);
 
-        JButton btnGuardar = new JButton("Actualizar Registro");
-        //contenedor2.setBackground(Color.WHITE);
-        contenedor2.add(btnGuardar);
+        btnGuardarCambios = new JButton("Actualizar Registro");
+        formModificar = new FormularioDatos(tipoUsuaurio, btnGuardarCambios);
+        contenedor1.add(formModificar);
+        contenedor2.add(btnGuardarCambios);
 
         contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
-        //contenedor.setBackground(Color.WHITE);
         contenedor.add(contenedor1);
-        //contenedor.add(Box.createHorizontalGlue());
         contenedor.add(contenedor2);
-        //contenedor.add(Box.createHorizontalGlue());
-        tabbedPane.addTab("Nuevo Registro", null, contenedor);
+        tabbedPane.addTab("Modificar Registro", null, contenedor);
 
-        btnGuardar.addActionListener(new ActionListener()
+        btnGuardarCambios.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                guardarNuevoRegistro();
+                guardarCambiosRegistro(formModificar, arrayCompletoRegistros, tipoUsuaurio, indexRegistro);
             }
-        }
-        );
+        });
     }
 
     private void initPanelConsultar()
     {
-        String[] columnNames =
+        String[] columnNames;
+        if (tipoUsuaurio)
         {
-            "Clave", "Nombre", "Primer A", "Segundo A", "Sexo", "Estatus", "Desnutricion", "Sobrepeso", "Alergias", "Obesida", "Diabetes", "Otra"
-        };
-        contenedorTabla = new JPanel(new BorderLayout());        
+            columnNames = new String[]
+            {
+                "Clave", "Nombre(s)", "Apellido Paterno", "Apellido Materno", "Sexo", "Estatus", "Desnutricion", "Sobrepeso", "Alergias", "Obesida", "Diabetes", "Otra"
+            };
+        } else
+        {
+            columnNames = new String[]
+            {
+                "Clave", "Nombre(s)", "Apellido Paterno", "Apellido Materno", "Sexo", "Carrera", "Vive Con", "Desnutricion", "Sobrepeso", "Alergias", "Obesida", "Diabetes", "Otra"
+            };
+        }
+        contenedorTabla = new JPanel(new BorderLayout());
         model = new DefaultTableModel()
         {
             @Override
@@ -539,6 +723,34 @@ public class MenuPersonal extends JPanel
             }
         };
         model.setColumnIdentifiers(columnNames);
+
+        tabla = new JTable(model);
+        tabla.addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
+                {
+                    // Obtener la fila seleccionada
+                    int filaSeleccionada = tabla.getSelectedRow();
+                    // Hacer algo con la fila seleccionada
+                    if (filaSeleccionada != -1)
+                    {
+                        // Obtener los datos de la fila seleccionada
+                        Object valorColumna1 = tabla.getValueAt(filaSeleccionada, 0);
+                        Object valorColumna2 = tabla.getValueAt(filaSeleccionada, 1);
+                        // Hacer algo con los valores obtenidos
+                        System.out.println("Doble clic en la fila: " + filaSeleccionada);
+                        System.out.println("Valor en la Columna1: " + valorColumna1);
+                        System.out.println("Valor en la Columna2: " + valorColumna2);
+                    }
+                }
+            }
+        });
+
+        scrollTabla = new JScrollPane(tabla);
+        contenedorTabla.add(scrollTabla, BorderLayout.CENTER);
         tabbedPane.addTab("Consultar Registros", null, contenedorTabla);
     }
 
@@ -548,89 +760,36 @@ public class MenuPersonal extends JPanel
         JPanel contenedor1 = new JPanel();
         JPanel contenedor2 = new JPanel();
         JPanel contenedor3 = new JPanel();
-        formularioRegistro = new FormularioDatos(tipoUsuaurio);
-        FormularioMedico formularioMedico = new FormularioMedico();
-        //contenedor.setLayout(new FlowLayout(FlowLayout.CENTER));
-        //contenedor1.setBackground(Color.WHITE);
-        formularioMedico.setBorder(BorderFactory.createTitledBorder(""));
-        contenedor1.add(formularioRegistro);
-        contenedor2.add(formularioMedico);
-        
+
         JButton btnGuardar = new JButton("Guardar Consulta Medica");
-        //contenedor2.setBackground(Color.WHITE);
+        formDatos = new FormularioDatos(tipoUsuaurio, null);
+        formularioMedico = new FormularioMedico();
+        formularioMedico.setBorder(BorderFactory.createTitledBorder(""));
+        contenedor1.add(formDatos);
+        contenedor2.add(formularioMedico);
         contenedor3.add(btnGuardar);
 
         contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
-        //contenedor.setBackground(Color.WHITE);
         contenedor.add(contenedor1);
-        //contenedor.add(Box.createHorizontalGlue());
         contenedor.add(contenedor2);
         contenedor.add(contenedor3);
-        //contenedor.add(Box.createHorizontalGlue());
-        tabbedPane.addTab("Nuevo Registro", null, new JScrollPane(contenedor));
+        tabbedPane.addTab("Nueva Consulta Medica", null, new JScrollPane(contenedor));
 
         btnGuardar.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                guardarNuevoRegistro();
+                //guardarNuevoRegistro();
             }
-        }
-        );
-        /*JPanel conten = new JPanel();
-        conten.setLayout(new BoxLayout(conten, BoxLayout.X_AXIS));
-        JPanel contenedor = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        Formulario formulario = new Formulario(true);
-        formulario.habilitarComponentes(false);
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        contenedor.add(new JLabel("Clave"), gbc);
-        gbc.gridx = 1;
-        contenedor.add(new JTextField(10), gbc);
-        gbc.gridy = 1;
-        JButton btnBuscar = new JButton("Buscar");
-        contenedor.add(btnBuscar, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        JSeparator separator = new JSeparator(SwingConstants.VERTICAL);
-        conten.add(contenedor);
-        conten.add(separator);
-
-        JPanel contenedor2 = new JPanel();
-        JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setEnabled(false);
-        contenedor2.add(btnCancelar);
-        JButton btnGuardar = new JButton("Guardar");
-        btnGuardar.setEnabled(false);
-        contenedor2.add(btnGuardar);
-
-        JPanel contenedor3 = new JPanel();
-        contenedor3.setLayout(new BoxLayout(contenedor3, BoxLayout.Y_AXIS));
-        contenedor3.add(formulario);
-        contenedor3.add(contenedor2);
-        conten.add(contenedor3);
-        tabbedPane.addTab("Nueva Consulta Medica", null, conten);
-
-        btnBuscar.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                formulario.habilitarComponentes(true);
-                btnGuardar.setEnabled(true);
-                btnCancelar.setEnabled(true);
-            }
-        });*/
+        });
     }
 
     /**
      * inicializa los iconos de la barra de herramientas
+     *
      * @param txt se asigna como setToolTipText
-     * @param nomIcon contiene el nombre del icono de la herramienta 
+     * @param nomIcon contiene el nombre del icono de la herramienta
      */
     private void initHerramientas(String[] txt, String[] nomIcon)
     {
@@ -645,13 +804,21 @@ public class MenuPersonal extends JPanel
                 iconos[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
                 iconos[i].setToolTipText(txt[i]);
                 if (i == 6)
+                {
                     panelHerramientas.add(separador);
+                }
                 panelHerramientas.add(iconos[i]);
             }
         }
     }
 
-    private void habilitarHerraminetas(JLabel... s)
+    /**
+     * Habilitas las herramientas, dependera de la pestaña donde se encuentre
+     * activara las herramientas que se ocupen
+     *
+     * @param s
+     */
+    private void verHerramientas(JLabel... s)
     {
         if (s.length <= iconos.length)
         {
@@ -670,120 +837,256 @@ public class MenuPersonal extends JPanel
         }
     }
 
-    private void guardarNuevoRegistro()
+    private void guardarRegistro(FormularioDatos form, boolean usurio)
     {
-        if (formularioRegistro.camposVacios())
+        if (form != null && form.camposVacios())
         {
-            JOptionPane.showMessageDialog(null, "Todos los campos requeridos deben ser llenados, verifique si a activado algun checkbox que requiera mas informacion este no puede quedar vacio");
+            JOptionPane.showMessageDialog(null, "Todos los campos deben ser llenados");
         } else
         {
-            if (formularioRegistro.validarFormulario())
+            if (form != null && form.validarFormulario())
             {
-                
-                Datos personal = new Personal(formularioRegistro.getEstatus().getSelectedIndex(),
-                        formularioRegistro.getCve().getText(), formularioRegistro.getNombre().getText(),
-                        formularioRegistro.getPrimerAp().getText(),formularioRegistro.getSegundoAp().getText(), 
-                        (formularioRegistro.getRbtMasculino().isSelected()) ? 'H':'M', 
-                        formularioRegistro.getDesnutricion().isSelected(), formularioRegistro.getSobrepeso().isSelected(),
-                        formularioRegistro.getAlergias().isSelected(), formularioRegistro.getObesidad().isSelected(), 
-                        formularioRegistro.getDiabetes().isSelected(), formularioRegistro.getOtrasCual().getText());
-                if(ctrl.ManipulacionArchivos.guardarReg(panelAreaTrabajo, personal, "personal.dat"))
+                Datos[] registros = (Datos[]) ctrl.ManipulacionArchivos.cargaArch("datos.dat");
+                if (buscarRegistro(registros, form.getCve().getText()) < 0)
                 {
-                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro exitoso");
-                    //formularioRegistro.limpiarFormulario();
-                }else
-                {
-                    JOptionPane.showMessageDialog(panelAreaTrabajo,"No se a podido guardar el Registo", "Error al guardar el registro", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }
-    }
-    
-    private JScrollPane llenarTabla(Datos[] lista)
-    {
-        tablaMostrar = lista;
-        for (Datos dato : lista) {
-            if(dato instanceof Personal)
-            {
-                Object[] fila = {dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(), 
-                    dato.getSexo(), (((Personal) dato).getEstatus() == 1)?"Permante":"Tempora", 
-                    dato.isDesnutriccion() ? "Si": "No", dato.isSobrepeso()? "Si": "No", dato.isAlergias()? "Si": "No",
-                    dato.isObecidad()? "Si": "No", dato.isDiabetes() ? "Si": "No", dato.getOtras()};
-                model.addRow(fila);
-            } 
-        }
-        tabla = new JTable(model);
-        tabla.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-                    // Obtener la fila seleccionada
-                    int filaSeleccionada = tabla.getSelectedRow();
-                    
-                    // Hacer algo con la fila seleccionada
-                    if (filaSeleccionada != -1) {
-                        // Obtener los datos de la fila seleccionada
-                        Object valorColumna1 = tabla.getValueAt(filaSeleccionada, 0);
-                        Object valorColumna2 = tabla.getValueAt(filaSeleccionada, 1);
-                        
-                        // Hacer algo con los valores obtenidos
-                        System.out.println("Doble clic en la fila: " + filaSeleccionada);
-                        System.out.println("Valor en la Columna1: " + valorColumna1);
-                        System.out.println("Valor en la Columna2: " + valorColumna2);
+                    if (ctrl.ManipulacionArchivos.guardarReg(null, insertarRegistro(registros, crearRegistro(form, usurio)), "datos.dat"))
+                    {
+                        JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro exitoso");
+                        form.limpiarFormulario();
+                    } else
+                    {
+                        JOptionPane.showMessageDialog(panelAreaTrabajo, "No se a podido guardar el Registo", "Error al guardar el registro", JOptionPane.ERROR_MESSAGE);
                     }
+                } else
+                {
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "La clave ingresada no se encuentra disponible", "Clave duplicada", JOptionPane.WARNING_MESSAGE);
                 }
             }
-        });
-        return new JScrollPane(tabla);
+        }
     }
-    
-    private int[] buscarNombre(String nombre)
+
+    private Datos crearRegistro(FormularioDatos form, boolean usuario)
     {
-        int[] arryB = null;
-        if(tablaMostrar != null)
+        if (usuario)
         {
-            for (int i = 0; i < tablaMostrar.length; i++)
+            return new Personal(form.getEstatus().getSelectedIndex(),
+                    form.getCve().getText(), form.getNombre().getText(),
+                    form.getPrimerAp().getText(), form.getSegundoAp().getText(),
+                    (form.getRbtMasculino().isSelected()) ? 'M' : 'F',
+                    form.getDesnutricion().isSelected(), form.getSobrepeso().isSelected(),
+                    form.getAlergias().isSelected(), form.getObesidad().isSelected(),
+                    form.getDiabetes().isSelected(), (form.getOtras().isSelected()) ? form.getOtrasCual().getText() : "No");
+        } else
+        {
+            return new Alumnos(form.getViveCon().getSelectedIndex(), form.getEstatus().getSelectedIndex(),
+                    form.getCve().getText(), form.getNombre().getText(),
+                    form.getPrimerAp().getText(), form.getSegundoAp().getText(),
+                    (form.getRbtMasculino().isSelected()) ? 'M' : 'F',
+                    form.getDesnutricion().isSelected(), form.getSobrepeso().isSelected(),
+                    form.getAlergias().isSelected(), form.getObesidad().isSelected(),
+                    form.getDiabetes().isSelected(), (form.getOtras().isSelected()) ? form.getOtrasCual().getText() : "No");
+        }
+    }
+
+    private Object[] insertarRegistro(Object[] registros, Object registro)
+    {
+        if (registros == null)
+        {
+            registros = new Datos[1];
+        } else
+        {
+            Datos nvoArray[] = new Datos[registros.length + 1];
+            System.arraycopy(registros, 0, nvoArray, 0, registros.length);
+            registros = nvoArray;
+        }
+        registros[registros.length - 1] = registro;
+        return registros;
+    }
+
+    private int buscarRegistroModificar(Datos[] registros, FormularioDatos form)
+    {
+        String clave = JOptionPane.showInputDialog("Ingrese clave del " + ((tipoUsuaurio) ? "Personal" : "Alumo"));
+        int index = -1;
+        if (clave != null && !clave.trim().isEmpty())
+        {
+            index = buscarRegistro(registros, clave);
+            if (index >= 0 && ((tipoUsuaurio && registros[index] instanceof Personal) || (!tipoUsuaurio && registros[index] instanceof Alumnos)))
             {
-                if (tablaMostrar[i].getNom().equalsIgnoreCase(nombre))
+               mostrarDatosModificar(registros[index], form);
+            } else
+            {
+                JOptionPane.showMessageDialog(null, "Clave NO asociada a ningun registro de " + ((tipoUsuaurio) ? "Personal" : "Alumnos") + ".\nEs importante ingresar la clave tal y como aparecia al momento de realizar el registro", "Clave no encotrada", JOptionPane.ERROR_MESSAGE);             
+                index = -1;
+            }
+        }
+        return index;
+    }
+    
+    private void mostrarDatosModificar(Datos dato, FormularioDatos form)
+    {
+        if(form != null)
+        {
+            form.getCve().setText(dato.getCve());
+            form.getNombre().setText(dato.getNom());
+            form.getPrimerAp().setText(dato.getPrimerAp());
+            form.getSegundoAp().setText(dato.getSegundoAp());
+            form.getEstatus().setSelectedIndex((tipoUsuaurio) ? ((Personal)dato).getEstatus() : ((Alumnos)dato).getCarrera());
+            if(!tipoUsuaurio)
+            {
+                form.getViveCon().setSelectedIndex(((Alumnos)dato).getViveCon());
+            }        
+            form.getRbtMasculino().setSelected((dato.getSexo() == 'M'));
+            form.getRbtFemenino().setSelected((dato.getSexo() == 'F'));
+            form.getDesnutricion().setSelected(dato.isDesnutriccion());
+            form.getSobrepeso().setSelected(dato.isSobrepeso());
+            form.getAlergias().setSelected(dato.isAlergias());
+            form.getObesidad().setSelected(dato.isObecidad());
+            form.getDiabetes().setSelected(dato.isDiabetes());
+            form.getOtras().setSelected(!dato.getOtras().equals("No"));
+            if(!dato.getOtras().equals("No"))
+            {
+                form.getOtrasCual().setText(dato.getOtras());
+            }
+//            ctrl.CtrlInterfaz.habilita(true, form.getEstatus());
+//            ctrl.CtrlInterfaz.habilita(true, form.getDesnutricion(), form.getSobrepeso(), form.getAlergias(), form.getObesidad(), form.getDiabetes(), form.getOtras());
+    ///        ctrl.CtrlInterfaz.habilita(true, btnGuardarCambios, iconos[3], iconos[4]);
+        }
+    }
+
+    private void guardarCambiosRegistro(FormularioDatos form, Datos[] registros, boolean usurio, int index)
+    {
+        if (form != null && form.camposVacios())
+        {
+            JOptionPane.showMessageDialog(null, "Todos los campos deben ser llenados");
+        } else
+        {
+            if (form != null && form.validarFormulario())
+            {
+                if (ctrl.ManipulacionArchivos.guardarReg(null, modifcarRegistro(registros, crearRegistro(form, usurio), index), "datos.dat"))
                 {
-                    if(arryB == null)
-                    {
-                        arryB = new int[1];
-                        arryB[0] = i; 
-                    }else
-                    {
-                        int[] tmpArray = new int[arryB.length];
-                        System.arraycopy(arryB, 0, tmpArray, 0, arryB.length);
-                        tmpArray[arryB.length] = 1;
-                        arryB = tmpArray;
-                    }
-                    System.out.println(i);
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro actualizado exitosamente");
+                    //form.limpiarFormulario();
+                } else
+                {
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "No se a podido actualizar el Registo", "Error al actualizar el registro", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
-        return arryB;
+    }
+
+    private Object[] modifcarRegistro(Object[] registros, Object registro, int index)
+    {
+        if (registros != null && index >= 0 && index < registros.length)
+        {
+            registros[index] = registro;
+        }
+        return registros;
+    }
+
+    private void llenarTabla(Datos[] lista, boolean usuario)
+    {
+        listaActualMostrar = lista;
+        Object[] fila = null;
+        for (Datos dato : lista)
+        {
+            if (usuario && dato instanceof Personal)
+            {
+                fila = new Object[]
+                {
+                    dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(),
+                    dato.getSexo(), FormularioDatos.ESTATUS[((Personal) dato).getEstatus()],
+                    dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
+                    dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
+                };
+
+            } else if (!usuario && dato instanceof Alumnos)
+            {
+                fila = new Object[]
+                {
+                    dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(),
+                    dato.getSexo(), FormularioDatos.CARRERAS[((Alumnos) dato).getCarrera()], FormularioDatos.VIVECON[((Alumnos) dato).getViveCon()],
+                    dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
+                    dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
+                };
+
+            }
+            if (fila != null)
+            {
+                model.addRow(fila);
+                fila = null;
+            }
+        }
+    }
+
+    private int buscarRegistro(Datos[] registros, String clave)
+    {
+        int index = -1;
+        if (registros != null)
+        {
+            for (int i = 0; i < registros.length; i++)
+            {
+                if (registros[i].getCve().equals(clave))
+                {
+                    return i;
+                }
+            }
+        }
+        return index;
+    }
+
+    private void filtrar(Datos[] registros, int sexo, int padecimineto, boolean usuario)
+    {
+        Object[] fila = null;
+        model.setRowCount(0);
+        if (registros != null)
+        {
+            for (Datos dato : registros)
+            {
+                if ((sexo == 0 || (dato.getSexo()=='M' && sexo == 1) || (dato.getSexo()=='F' && sexo == 2))
+                        && ((padecimineto == 0 || (dato.isDesnutriccion() && padecimineto == 1) || (dato.isSobrepeso() && padecimineto == 2)
+                            || (dato.isAlergias() && padecimineto == 3) || (dato.isObecidad() && padecimineto == 4))
+                            || (dato.isDiabetes() && padecimineto == 5) || (!dato.getOtras().equals("No")&& padecimineto == 6)))
+                {
+                    if (usuario && dato instanceof Personal)
+                    {
+                        fila = new Object[]
+                        {
+                            dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(),
+                            dato.getSexo(), FormularioDatos.ESTATUS[((Personal) dato).getEstatus()],
+                            dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
+                            dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
+                        };
+
+                    } else if (!usuario && dato instanceof Alumnos)
+                    {
+                        fila = new Object[]
+                        {
+                            dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(),
+                            dato.getSexo(), FormularioDatos.CARRERAS[((Alumnos) dato).getCarrera()], FormularioDatos.VIVECON[((Alumnos) dato).getViveCon()],
+                            dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
+                            dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
+                        };
+
+                    }
+                }
+                if (fila != null)
+                {
+                    model.addRow(fila);
+                    fila = null;
+                }
+            }
+        }
     }
     
-    private void filtrar(char genero)
-    {
-//        Datos[] tmp;
-//        for (int i = 0; i < tablaMostrar.length; i++)
-//        {
-//            if(tablaMostrar[i].getSexo() == genero)
-//            {
-//                if(tmp == null)
-//                    {
-//                        tmp = new Datos[1];
-//                        tmp[0] = tablaMostrar[i]; 
-//                    }else
-//                    {
-//                        Datos[] tmpArray = new Datos[tmp.length];
-//                        System.arraycopy(tmp, 0, tmpArray, 0, tmp.length);
-//                        tmpArray[tmp.length] = tablaMostrar[i];
-//                        tmp = tmpArray;
-//                    }
-//            }
-//        }
+    private void selectRow(JTable table, int columnIndex, String key) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        int rowCount = model.getRowCount();
+        for (int row = 0; row < rowCount; row++) {
+            String cellValue = String.valueOf(model.getValueAt(row, columnIndex));
+            if (cellValue.equals(key)) {
+                table.setRowSelectionInterval(row, row);
+                break;
+            }
+        }
     }
-            
 }

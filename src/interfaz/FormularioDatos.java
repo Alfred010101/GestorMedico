@@ -15,6 +15,7 @@ import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -29,18 +30,19 @@ import javax.swing.JTextField;
  */
 public class FormularioDatos extends JPanel
 {
+
     private JTextField cve;
     private JTextField nombre;
     private JTextField primerAp;
     private JTextField segundoAp;
-    
+
     private ButtonGroup group;
     private JRadioButton rbtMasculino;
     private JRadioButton rbtFemenino;
-    
+
     private JComboBox estatus;
     private JComboBox viveCon;
-    
+
     private JCheckBox desnutricion;
     private JCheckBox sobrepeso;
     private JCheckBox alergias;
@@ -48,30 +50,48 @@ public class FormularioDatos extends JPanel
     private JCheckBox diabetes;
     private JCheckBox otras;
     private JTextField otrasCual;
-    
+    private JButton btn;
+
     private boolean tipoUsuario;
+
+    private final String pathImagenes = "src/interfaz/imagenes/";
     
-    final String pathImagenes = "src/interfaz/imagenes/";
+    public static final String[] ESTATUS =
+    {
+        "", "Base", "Temporal"
+    };
+    public static final String[] VIVECON =       
+    {
+        "", "Mamá", "Papá", "Ambos"
+    };
+    public static final String[] CARRERAS =
+    {
+        "", "Ing. en Software", "Ing. en Produccion Industrical", "Ing. en Plasticos", "Ing. Mecanica", "Lic. en Seguridad Ciudadana"
+    };
+
     
     /**
      * Constructor para el formulario de registro
+     *
      * @param tipoUsuario indica si es Personal (V) o Alumnos (F)
      */
-    public FormularioDatos(boolean tipoUsuario)
+    public FormularioDatos(boolean tipoUsuario, JButton btn)
     {
         this.setLayout(new GridBagLayout());
         this.tipoUsuario = tipoUsuario;
+        this.btn = btn;
         initComponets();
     }
 
-    public FormularioDatos(Color rgb, boolean tipoUsuario)
+    public FormularioDatos(Color rgb, boolean tipoUsuario, JButton btn)
     {
         this.setLayout(new GridBagLayout());
         this.setBackground(rgb);
         this.tipoUsuario = tipoUsuario;
+        this.btn = btn;
         initComponets();
     }
-    
+
     /**
      * @return the cve
      */
@@ -215,8 +235,11 @@ public class FormularioDatos extends JPanel
     {
         this.tipoUsuario = type;
     }
-    
-     private void initComponets()
+
+    /**
+     * Inicializando componentes.
+     */
+    private void initComponets()
     {
         cve = new JTextField(12);
         nombre = new JTextField(18);
@@ -229,31 +252,21 @@ public class FormularioDatos extends JPanel
         diabetes = new JCheckBox("Diabetes");
         otras = new JCheckBox("Otro");
         otrasCual = new JTextField(18);
-        
-        getOtrasCual().setEnabled(false);
+        otrasCual.setEnabled(false);
 
         String[] opcEstatus;
         if (isType())
         {
-            opcEstatus = new String[]
-            {
-                "", "Base", "Temporal"
-            };
+            opcEstatus = ESTATUS;
         } else
         {
-            opcEstatus = new String[]
-            {
-                 "", "Ing. en Software", "Ing. en Produccion Industrical", "Ing. en Plasticos", "Ing. Mecanica", "Lic. en Seguridad Ciudadana"
-            };
+            opcEstatus = CARRERAS;
         }
-        String[] opcVive= new String[]
-        {
-              "", "Mamá", "Papá", "Ambos"
-        };
+        String[] opcVive = VIVECON;
 
         viveCon = new JComboBox(opcVive);
         estatus = new JComboBox(opcEstatus);
-        
+
         JPanel contenedor1 = new JPanel();
         contenedor1.setBorder(BorderFactory.createTitledBorder("Sexo"));
         group = new ButtonGroup();
@@ -263,12 +276,12 @@ public class FormularioDatos extends JPanel
         group.add(rbtFemenino);
         contenedor1.add(rbtMasculino);
         contenedor1.add(rbtFemenino);
-        
+
         JPanel contenedor3 = new JPanel();
         JPanel contenedor4 = new JPanel();
         contenedor3.add(desnutricion);
         contenedor3.add(sobrepeso);
-        contenedor3.add(alergias);        
+        contenedor3.add(alergias);
         contenedor3.add(obesidad);
         contenedor4.add(diabetes);
         contenedor4.add(otras);
@@ -277,17 +290,20 @@ public class FormularioDatos extends JPanel
         contenedor2.setBorder(BorderFactory.createTitledBorder("Padeciminetos"));
         contenedor2.add(contenedor3);
         contenedor2.add(contenedor4);
-        
-        
-        this.add(new JLabel(new ImageIcon(pathImagenes+"avatar.png")), 
+
+        /**
+         * Agregando componentes al JPane (CENTER) se asigna la poscion de
+         * visualizacion.
+         */
+        this.add(new JLabel(new ImageIcon(pathImagenes + "avatar.png")),
                 new GridBagConstraints(2, 0, 1, 2, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(10, 5, 5, 5), 0, 0));
-        this.add(new JLabel("Clave"), 
+        this.add(new JLabel("Clave"),
                 new GridBagConstraints(0, 1, 2, 1, 0, 0, GridBagConstraints.SOUTH, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5), 0, 0));
-        this.add(cve, 
+        this.add(cve,
                 new GridBagConstraints(0, 2, 2, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5), 0, 0));
-        this.add(new JLabel((tipoUsuario) ? "Estatus" : "Carrera"), 
+        this.add(new JLabel((tipoUsuario) ? "Estatus" : "Carrera"),
                 new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.SOUTH, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5), 0, 0));
-        this.add(estatus, 
+        this.add(estatus,
                 new GridBagConstraints(3, 2, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5), 0, 0));
         this.add(new JLabel("Nombre(s)"),
                 new GridBagConstraints(0, 3, 2, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(20, 5, 5, 5), 0, 0));
@@ -297,161 +313,149 @@ public class FormularioDatos extends JPanel
                 new GridBagConstraints(2, 3, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(20, 5, 5, 5), 0, 0));
         this.add(primerAp,
                 new GridBagConstraints(2, 4, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5), 0, 0));
-        this.add(new JLabel("Apellido Materno"), 
+        this.add(new JLabel("Apellido Materno"),
                 new GridBagConstraints(3, 3, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(20, 5, 5, 5), 0, 0));
-        this.add(segundoAp, 
+        this.add(segundoAp,
                 new GridBagConstraints(3, 4, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5), 0, 0));
-        if(!isType())
+        if (!isType())
         {
-            this.add(new JLabel("Vive con"), 
-                new GridBagConstraints(0, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.EAST, new Insets(20, 5, 5, 5), 0, 0));
-            this.add(viveCon, 
-                new GridBagConstraints(1, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(20, 5, 5, 5), 0, 0));
+            this.add(new JLabel("Vive con"),
+                    new GridBagConstraints(0, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.EAST, new Insets(20, 5, 5, 5), 0, 0));
+            this.add(viveCon,
+                    new GridBagConstraints(1, 6, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(20, 5, 5, 5), 0, 0));
         }
         this.add(contenedor1,
                 new GridBagConstraints(0, 7, 2, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(5, 5, 5, 5), 0, 0));
         this.add(contenedor2,
                 new GridBagConstraints(2, 6, 2, 2, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(20, 5, 5, 5), 0, 0));
 
-        getCve().addKeyListener(new KeyAdapter()
+        /**
+         * Asignando comportamiento de navegacion cambiando el foco tambien
+         * validacion de entrada de caracteres ENTER solo cuando el campo no
+         * esta vacio, si el campo contiene espacios puede continuar,
+         * posteriormente se le indicara la validacion correspondiente.
+         */
+        cve.addKeyListener(new KeyAdapter()
         {
             @Override
             public void keyTyped(KeyEvent e)
             {
-                ctrl.Validaciones.validaAlfanumerico(e, 15, getCve().getText());
-                //char c = e.getKeyChar();
-                //System.out.println("Tecla Typed: " + c);
+                ctrl.Validaciones.validaAlfanumerico(e, 15, cve.getText());
+                //System.out.println("Tecla Typed: " + e.getKeyChar());
             }
 
             @Override
             public void keyPressed(KeyEvent e)
             {
-                enterKeyPressed(e, getCve().getText(), getNombre());
+                enterKeyPressed(e, cve.getText(), estatus);
             }
         });
-        getNombre().addKeyListener(new KeyAdapter()
-        {
-            @Override
-            public void keyTyped(KeyEvent e)
-            {
-                ctrl.Validaciones.validaAlfabeticos(e, 30, getNombre().getText());
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e)
-            {
-                enterKeyPressed(e, getNombre().getText(), getPrimerAp());
-            }
-        });
-        getPrimerAp().addKeyListener(new KeyAdapter()
-        {
-            @Override
-            public void keyTyped(KeyEvent e)
-            {
-                ctrl.Validaciones.validaAlfabeticos(e, 30, getPrimerAp().getText());
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e)
-            {
-                enterKeyPressed(e, getPrimerAp().getText(), getSegundoAp());
-            }
-        });
-        getSegundoAp().addKeyListener(new KeyAdapter()
-        {
-            @Override
-            public void keyTyped(KeyEvent e)
-            {
-                ctrl.Validaciones.validaAlfabeticos(e, 30, getSegundoAp().getText());
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e)
-            {
-                enterKeyPressed(e, getSegundoAp().getText(), getRbtMasculino());
-            }
-        });
-        getRbtMasculino().addKeyListener(new KeyAdapter()
+        estatus.addKeyListener(new KeyAdapter()
         {
             @Override
             public void keyPressed(KeyEvent e)
             {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER && getRbtMasculino().isSelected())
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && estatus.getSelectedIndex() != 0)
                 {
-                    enterKeyPressed(e, getRbtMasculino().getText(), getEstatus());
+                    enterKeyPressed(e, " ", nombre);
                 }
             }
         });
-        getRbtFemenino().addKeyListener(new KeyAdapter()
+        nombre.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, nombre.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, nombre.getText(), primerAp);
+            }
+        });
+        primerAp.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, primerAp.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, primerAp.getText(), segundoAp);
+            }
+        });
+        segundoAp.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validaAlfabeticos(e, 30, segundoAp.getText());
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, segundoAp.getText(), (isType()) ? rbtMasculino : viveCon);
+            }
+        });
+        viveCon.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && viveCon.getSelectedIndex() != 0)
+                {
+                    enterKeyPressed(e, " ", rbtMasculino);
+                }
+            }
+        });
+        rbtMasculino.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && rbtMasculino.isSelected())
+                {
+                    enterKeyPressed(e, rbtMasculino.getText(), desnutricion);
+                }
+            }
+        });
+        rbtFemenino.addKeyListener(new KeyAdapter()
         {
             @Override
             public void keyPressed(KeyEvent e)
             {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER && getRbtFemenino().isSelected())
                 {
-                    enterKeyPressed(e, getRbtFemenino().getText(), getEstatus());
+                    enterKeyPressed(e, rbtFemenino.getText(), desnutricion);
                 }
             }
         });
-        getEstatus().addKeyListener(new KeyAdapter()
-        {
-            @Override
-            public void keyPressed(KeyEvent e)
-            {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER && getEstatus().getSelectedIndex() != 0)
-                {
-                    if (isType())
-                    {
-                        //enterKeyPressed(e, " ", getFecha());
-                    } else
-                    {
-                        enterKeyPressed(e, " ", getViveCon());
-                    }
-                }
-            }
-        });
-        getViveCon().addKeyListener(new KeyAdapter()
-        {
-            @Override
-            public void keyPressed(KeyEvent e)
-            {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER && getEstatus().getSelectedIndex() != 0)
-                {
-                    //enterKeyPressed(e, " ", getFecha());
-                }
-            }
-        });
-
-        getOtras().addItemListener(new ItemListener()
+        otras.addItemListener(new ItemListener()
         {
             @Override
             public void itemStateChanged(ItemEvent e)
             {
-                ctrl.CtrlInterfaz.itemStateChanged(getOtrasCual(), e);
+                ctrl.CtrlInterfaz.itemStateChanged(otrasCual, e);
             }
         });
-        getOtrasCual().addKeyListener(new KeyAdapter()
+        otrasCual.addKeyListener(new KeyAdapter()
         {
             @Override
             public void keyTyped(KeyEvent e)
             {
                 ctrl.Validaciones.vanTxt(e);
             }
-            
+
             @Override
             public void keyPressed(KeyEvent e)
             {
-                //enterKeyPressed(e, otrasCual.getText(), padecimientoActual);
-                if (e.getKeyCode() == KeyEvent.VK_TAB) {
-                    if (e.isShiftDown()) {
-                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusPreviousComponent();
-                        //ctrl.CtrlInterfaz.cambia(antecedentes);                        
-                    } else {
-                        e.consume();
-                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
-                        //ctrl.CtrlInterfaz.cambia(btnCan);
-                    }
-                }
+                enterKeyPressed(e, otrasCual.getText(), btn);
             }
         });
     }
@@ -466,135 +470,81 @@ public class FormularioDatos extends JPanel
 
     public boolean validarFormulario()
     {
-        if (!ctrl.Validaciones.validarInputCve(this.getCve().getText()))
+        if (!ctrl.Validaciones.validarInputCve(cve.getText()))
         {
             JOptionPane.showMessageDialog(null, "La clave no es valida, verifique y vuelva a intentar");
-            ctrl.CtrlInterfaz.selecciona(getCve());
+            ctrl.CtrlInterfaz.selecciona(cve);
             return false;
         }
-        if (!ctrl.Validaciones.validarInputNombre(this.getNombre().getText()))
+        if (!ctrl.Validaciones.validarInputNombre(nombre.getText()))
         {
             JOptionPane.showMessageDialog(null, "El nombre no es valido,  verifique y vuelva a intentar");
-            ctrl.CtrlInterfaz.selecciona(getNombre());
+            ctrl.CtrlInterfaz.selecciona(nombre);
             return false;
         }
-        if (!ctrl.Validaciones.validarInputNombre(this.getPrimerAp().getText()))
+        if (!ctrl.Validaciones.validarInputNombre(primerAp.getText()))
         {
             JOptionPane.showMessageDialog(null, "El apellido paterno no es valido, verifique y vuelva a intentar");
-            ctrl.CtrlInterfaz.selecciona(getPrimerAp());
+            ctrl.CtrlInterfaz.selecciona(primerAp);
             return false;
         }
-        if (!ctrl.Validaciones.validarInputNombre(this.getSegundoAp().getText()))
+        if (!ctrl.Validaciones.validarInputNombre(segundoAp.getText()))
         {
             JOptionPane.showMessageDialog(null, "El apellido materno no es valido, verifique y vuelva a intentar");
-            ctrl.CtrlInterfaz.selecciona(getSegundoAp());
+            ctrl.CtrlInterfaz.selecciona(segundoAp);
             return false;
         }
-        
-        Date fecha;
-        SimpleDateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
-        SimpleDateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy");
-        formato1.setLenient(false);
-        formato2.setLenient(false);
-
-//        try
-//        {
-//            fecha = formato1.parse(this.getFecha().getText());
-//        } catch (ParseException ex1)
-//        {
-//            try
-//            {
-//                fecha = formato2.parse(this.getFecha().getText());
-//            } catch (ParseException ex2)
-//            {
-//                JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto");
-//                ctrl.CtrlInterfaz.selecciona(this.getFecha());
-//                return false;
-//            }
-//        }
         return true;
     }
-    
+
     public boolean camposVacios()
     {
-        if (this.getCve().getText().trim().isEmpty())
+        if (cve.getText().trim().isEmpty())
         {
-            ctrl.CtrlInterfaz.selecciona(getCve());
+            ctrl.CtrlInterfaz.selecciona(cve);
             return true;
         }
-        if (this.getNombre().getText().trim().isEmpty())
+        if (nombre.getText().trim().isEmpty())
         {
-            ctrl.CtrlInterfaz.selecciona(getNombre());
+            ctrl.CtrlInterfaz.selecciona(nombre);
             return true;
         }
-        if (this.getPrimerAp().getText().trim().isEmpty())
+        if (primerAp.getText().trim().isEmpty())
         {
-            ctrl.CtrlInterfaz.selecciona(getPrimerAp());
+            ctrl.CtrlInterfaz.selecciona(primerAp);
             return true;
         }
-        if (this.getSegundoAp().getText().trim().isEmpty())
+        if (segundoAp.getText().trim().isEmpty())
         {
-            ctrl.CtrlInterfaz.selecciona(getSegundoAp());
+            ctrl.CtrlInterfaz.selecciona(segundoAp);
             return true;
         }
-        if (!this.getRbtMasculino().isSelected() && !this.getRbtFemenino().isSelected())
+        if (!rbtMasculino.isSelected() && !rbtFemenino.isSelected())
         {
-            ctrl.CtrlInterfaz.cambia(getRbtMasculino());
+            ctrl.CtrlInterfaz.cambia(rbtMasculino);
             return true;
         }
-        if (this.isType() && this.getEstatus().getSelectedIndex() == 0)
+        if (estatus.getSelectedIndex() == 0)
         {
-            ctrl.CtrlInterfaz.cambia(getEstatus());
-            return true;
-        } else
-        {
-            if (this.getEstatus().getSelectedIndex() == 0)
-            {
-                ctrl.CtrlInterfaz.cambia(getEstatus());
-                return true;
-            }
-        }
-        if (!this.isType() && this.getViveCon().getSelectedIndex() == 0)
-        {
-            ctrl.CtrlInterfaz.cambia(getViveCon());
+            ctrl.CtrlInterfaz.cambia(estatus);
             return true;
         }
-//        if(this.getFecha().getText().trim().isEmpty())
-//        {
-//            ctrl.CtrlInterfaz.selecciona(getFecha());
-//            return true;
-//        }
-        if(this.getOtras().isSelected() && this.getOtrasCual().getText().trim().isEmpty())
+        if (!isType() && viveCon.getSelectedIndex() == 0)
         {
-            ctrl.CtrlInterfaz.selecciona(getOtrasCual());
+            ctrl.CtrlInterfaz.cambia(viveCon);
             return true;
         }
-//        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().trim().isEmpty())
-//        {
-//            ctrl.CtrlInterfaz.selecciona(padecimientoCual);
-//            return true;
-//        }
-//        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().trim().isEmpty())
-//        {
-//            ctrl.CtrlInterfaz.selecciona(planTratamientoCual);
-//            return true;
-//        }
-//        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().trim().isEmpty())
-//        {
-//            ctrl.CtrlInterfaz.selecciona(medicamentoCual);
-//            return true;
-//        }
-//        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().trim().isEmpty())
-//        {
-//            ctrl.CtrlInterfaz.selecciona(antecedentesCual);
-//            return true;
-//        }
+        if (otras.isSelected() && otrasCual.getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(otrasCual);
+            return true;
+        }
         return false;
     }
-    
+
     public void limpiarFormulario()
     {
-        ctrl.CtrlInterfaz.limpiarComponentes(null, getCve(), getNombre(), getPrimerAp(), getSegundoAp(), getEstatus(), getViveCon(), getGroup(), getDesnutricion(), getSobrepeso(), getAlergias(), getObesidad(), getDiabetes(), getOtras(), getOtrasCual());
+        ctrl.CtrlInterfaz.limpiarComponentes(cve, cve, nombre, primerAp, segundoAp, estatus, viveCon, group, desnutricion, sobrepeso, alergias, obesidad, diabetes, otras, otrasCual);
     }
 
     public void habilitarComponentes(boolean enable)
@@ -610,7 +560,7 @@ public class FormularioDatos extends JPanel
         }
         getRbtMasculino().setEnabled(enable);
         getRbtFemenino().setEnabled(enable);
-       // getFecha().setEnabled(enable);
+        // getFecha().setEnabled(enable);
         getDesnutricion().setEnabled(enable);
         getSobrepeso().setEnabled(enable);
         getAlergias().setEnabled(enable);

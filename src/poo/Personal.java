@@ -34,7 +34,7 @@ public class Personal extends Datos
     /**
      * @param estatus the estatus to set
      */
-    public void setEstatus(char estatus) 
+    public void setEstatus(int estatus) 
     {
         this.estatus = estatus;
     }

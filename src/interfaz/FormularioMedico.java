@@ -132,7 +132,6 @@ public class FormularioMedico extends JPanel
                 new GridBagConstraints(1, 1, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 15, 5, 5), 0, 0));
         this.add(planTratamientoCual, 
                 new GridBagConstraints(1, 2, 1, 1, 0, 0, GridBagConstraints.SOUTH, GridBagConstraints.CENTER, new Insets(5, 15, 5, 15), 0, 0));
-        
         this.add(medicamento, 
                 new GridBagConstraints(0, 3, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 15, 5, 5), 0, 0));
         this.add(medicamentoCual, 

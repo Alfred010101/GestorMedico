@@ -38,6 +38,8 @@ public class VentanaPrincipal extends JFrame
     private JPanel panelCenter;
     private CardLayout cardLayout;
 
+    private MenuPersonal mnuPersonal = new MenuPersonal(true);
+    private MenuPersonal mnuAlumnos = new MenuPersonal(false);
     private int mouseX, mouseY;
 
     private enum Menu
@@ -68,7 +70,7 @@ public class VentanaPrincipal extends JFrame
     {
         initComponents();
 
-        menuActivo = Menu.INICIO;        
+        menuActivo = Menu.INICIO;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         this.setUndecorated(true);
@@ -86,7 +88,7 @@ public class VentanaPrincipal extends JFrame
         panelPrincipal.setLayout(new BorderLayout());
         panelPrincipal.setBorder(new LineBorder(Color.GRAY, 2));
 
-        panelNorth = new ImagenPanel(new Color(0,145,234));
+        panelNorth = new ImagenPanel(new Color(0, 145, 234));
         //panelNorth = new ImagenPanel(new Color(133, 193, 233));
         panelNorth.setBorder(new LineBorder(Color.GRAY, 1));
         panelWest = new JPanel();
@@ -105,9 +107,9 @@ public class VentanaPrincipal extends JFrame
     }
 
     /**
-     * Configura el panelNorth Trabaja como la barra de titulo de un JFrame
-     * se agregan iconos basicos para la manipulacion de la ventana
-     * se configuaran los eventos minimizar, redimencionar, cerrar, mover ventana.
+     * Configura el panelNorth Trabaja como la barra de titulo de un JFrame se
+     * agregan iconos basicos para la manipulacion de la ventana se configuaran
+     * los eventos minimizar, redimencionar, cerrar, mover ventana.
      */
     private void initPanelNorth()
     {
@@ -151,7 +153,10 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                setExtendedState(JFrame.ICONIFIED);
+                if (e.getButton() == MouseEvent.BUTTON1)
+                {
+                    setExtendedState(JFrame.ICONIFIED);
+                }
             }
         });
 
@@ -174,17 +179,20 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                if (maximized)
+                if (e.getButton() == MouseEvent.BUTTON1)
                 {
-                    setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar la ventana
-                    redimencionar.setToolTipText("Restaurar");
-                } else
-                {
-                    setExtendedState(JFrame.NORMAL); // Restaurar la ventana al tamaño original
-                    redimencionar.setToolTipText("Maximizar");
+                    if (maximized)
+                    {
+                        setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar la ventana
+                        redimencionar.setToolTipText("Restaurar");
+                    } else
+                    {
+                        setExtendedState(JFrame.NORMAL); // Restaurar la ventana al tamaño original
+                        redimencionar.setToolTipText("Maximizar");
+                    }
+                    mouseExited(e);
+                    maximized = !maximized;
                 }
-                mouseExited(e);
-                maximized = !maximized;
             }
         });
 
@@ -205,8 +213,11 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                dispose();
-                System.exit(0);
+                if (e.getButton() == MouseEvent.BUTTON1)
+                {
+                    dispose();
+                    System.exit(0);
+                }
             }
         });
 
@@ -236,20 +247,23 @@ public class VentanaPrincipal extends JFrame
     }
 
     /**
-     * Configura el panelWest Trabaja como la barra de menu
-     * opciones: INICIO, PERSONAL, ALUMNOS, BUSCAR, AYUDA
+     * Configura el panelWest Trabaja como la barra de menu opciones: INICIO,
+     * PERSONAL, ALUMNOS, BUSCAR, AYUDA
      */
     private void initPanelWest()
     {
         panelWest.setBackground(new Color(236, 236, 236));
         panelWest.setLayout(new BoxLayout(panelWest, BoxLayout.Y_AXIS));
 
-        final String[] toolTipText = {"Inicio", "Personal", "Estudiantes", "Buscar", "Ayuda"};
+        final String[] toolTipText =
+        {
+            "Inicio (Ctrl + I)", "Personal (Ctrl + P)", "Estudiantes (Ctrl + E)", "Buscar (Ctrl + B)", "Ayuda (F1)"
+        };
         for (int i = 0; i < imgMenu.length; i++)
         {
             opcMenu[i] = new JLabel(new ImageIcon(pathImagenes + imgMenu[i]));
             opcMenu[i].setToolTipText(toolTipText[i]);
-            if (i == imgMenu.length -1)
+            if (i == imgMenu.length - 1)
             {
                 panelWest.add(Box.createVerticalGlue());
             }
@@ -259,10 +273,8 @@ public class VentanaPrincipal extends JFrame
         opcMenu[Menu.AYUDA.ordinal()].setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         /**
-         * Configuracion de los atajos de teclado 
-         * Ctrl + (I)nicio : Ctrl + (P)ersonal : 
-         * Ctrl + (A)lumnos : Ctrl + (B)uscar,
-         * F1 para la ayuda.
+         * Configuracion de los atajos de teclado Ctrl + (I)nicio : Ctrl +
+         * (P)ersonal : Ctrl + (A)lumnos : Ctrl + (B)uscar, F1 para la ayuda.
          */
         KeyStroke keyInicio = KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK);
         KeyStroke keyPersonal = KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK);
@@ -344,7 +356,10 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                activarMenu(Menu.INICIO);
+                if (evt.getButton() == MouseEvent.BUTTON1)
+                {
+                    activarMenu(Menu.INICIO);
+                }
             }
         });
 
@@ -371,7 +386,10 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                activarMenu(Menu.PERSONAL);
+                if (evt.getButton() == MouseEvent.BUTTON1)
+                {
+                    activarMenu(Menu.PERSONAL);
+                }                
             }
         });
 
@@ -398,7 +416,10 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                activarMenu(Menu.ESTUDIANTES);
+                if (evt.getButton() == MouseEvent.BUTTON1)
+                {
+                    activarMenu(Menu.ESTUDIANTES);
+                }                
             }
         });
 
@@ -425,7 +446,10 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                activarMenu(Menu.BUSCAR);
+                if (evt.getButton() == MouseEvent.BUTTON1)
+                {
+                    activarMenu(Menu.BUSCAR);
+                }
             }
 
         });
@@ -447,7 +471,10 @@ public class VentanaPrincipal extends JFrame
             @Override
             public void mousePressed(MouseEvent evt)
             {
-                activarAyuda();
+                if (evt.getButton() == MouseEvent.BUTTON1)
+                {
+                    activarAyuda();
+                }
             }
         });
     }
@@ -458,17 +485,25 @@ public class VentanaPrincipal extends JFrame
     private void initPanelCenter()
     {
         panelCenter.add(new MenuInicio(), "Panel 0");
-        panelCenter.add(new MenuPersonal(true), "Panel 1");
-        panelCenter.add(new MenuPersonal(false), "Panel 2");
+        panelCenter.add(mnuPersonal, "Panel 1");
+        panelCenter.add(mnuAlumnos, "Panel 2");
         panelCenter.add(new MenuBuscar(), "Panel 3");
     }
 
     /**
-     * Permite iterar entre los menus
-     * este es visible en el cardLayoud agregado en el panel central.
+     * Permite iterar entre los menus este es visible en el cardLayoud agregado
+     * en el panel central.
      */
     private void activarMenu(Menu menuIr)
     {
+        if (menuIr == Menu.PERSONAL)
+        {
+            mnuPersonal.restablecerEstadoInicial();
+        } else if (menuIr == Menu.ESTUDIANTES)
+        {
+            mnuAlumnos.restablecerEstadoInicial();
+        }
+
         if (menuIr != menuActivo)
         {
             opcMenu[menuActivo.ordinal()].setIcon(new ImageIcon(pathImagenes + imgMenu[menuActivo.ordinal()]));
