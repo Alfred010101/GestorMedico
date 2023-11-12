@@ -56,7 +56,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
     });
 
     @Override
-    public void restablecerEstadoInicial()
+    public void establecerEstadoInicial()
     {
         tabbedPane.setSelectedIndex(0);
         formRegistro.limpiarFormulario();
@@ -220,24 +220,10 @@ public class MenuPersonal extends JPanel implements EstadoInicial
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                //JDialog customDialog = new JDialog(new JFrame(), "Ventana Emergente", true);
-                /* VentanaEmergente customDialog = new VentanaEmergente(new JFrame(), "Buscar Registro");
-
-                customDialog.setSize(500, 200);
-                customDialog.setLocationRelativeTo(null);
-                customDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                JPanel conDia = new JPanel();
-                // Agregar contenido al JDialog
-                JLabel label = new JLabel("Contenido de la ventana emergente");
-                conDia.setBorder(new LineBorder(Color.GRAY, 1));
-                conDia.add(label);
-
-                conDia.add(new JButton("Linux"));
-                customDialog.add(conDia);
-
-                // Mostrar el JDialog
-                customDialog.setVisible(true);*/
-                //guardarNuevoRegistro();
+                if(tabbedPane.getSelectedIndex()==0)
+                {
+                    guardarRegistro(formRegistro, tipoUsuaurio);
+                }
             }
         });
         iconos[Herramienta.LIMPIAR.ordinal()].addMouseListener(new MouseAdapter()
@@ -428,7 +414,6 @@ public class MenuPersonal extends JPanel implements EstadoInicial
             {
                 if(iconos[7].isEnabled() && filtros != 1)
                 {
-                    //activarMenu(Menu.INICIO);
                     switch (filtros)
                     {
                         case 0:
@@ -469,9 +454,6 @@ public class MenuPersonal extends JPanel implements EstadoInicial
             {
                 if (iconos[8].isEnabled() && filtros != 2)
                 {
-//                    iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer_Hover.png"));
-//                    JOptionPane.showMessageDialog(null, "Hola");
-//                    filtros[0] = 2;
                     switch (filtros)
                     {
                         case 0:

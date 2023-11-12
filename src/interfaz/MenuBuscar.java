@@ -52,10 +52,11 @@ public class MenuBuscar extends JPanel implements EstadoInicial
         };
         model.setColumnIdentifiers(columnNames);
 
-        filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));
-        historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
+//        filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));
+//        historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
+//        establecerEstadoInicial();
+
         JTable tabla = new JTable(model);
-                
         tabla.addMouseListener(new MouseAdapter()
         {
             @Override
@@ -66,7 +67,7 @@ public class MenuBuscar extends JPanel implements EstadoInicial
                     int filaSeleccionada = tabla.getSelectedRow();
                     if (filaSeleccionada != -1 && historial[filaSeleccionada] != null)
                     {
-                        VentanaHistorial ventanaEmergente = new VentanaHistorial((String)tabla.getValueAt(filaSeleccionada, 1), historial[filaSeleccionada]);
+                        VentanaHistorial ventanaEmergente = new VentanaHistorial(tabla.getValueAt(filaSeleccionada, 1) + " " + tabla.getValueAt(filaSeleccionada, 2) + " " + tabla.getValueAt(filaSeleccionada, 3), historial[filaSeleccionada]);
                         ventanaEmergente.setVisible(true);
                     }else
                     {
@@ -75,7 +76,6 @@ public class MenuBuscar extends JPanel implements EstadoInicial
                 }
             }
         });
-
         JScrollPane scrollTabla = new JScrollPane(tabla);
         this.add(scrollTabla, BorderLayout.CENTER);
     }
@@ -88,7 +88,6 @@ public class MenuBuscar extends JPanel implements EstadoInicial
         {
             for (Datos dato : registros)
             {
-                
                 if (dato instanceof Personal)
                 {
                     fila = new Object[]
@@ -98,7 +97,6 @@ public class MenuBuscar extends JPanel implements EstadoInicial
                         dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
                         dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
                     };
-
                 } else if (dato instanceof Alumnos)
                 {
                     fila = new Object[]
@@ -107,8 +105,7 @@ public class MenuBuscar extends JPanel implements EstadoInicial
                         dato.getSexo(), "----", FormularioDatos.CARRERAS[((Alumnos) dato).getCarrera()], FormularioDatos.VIVECON[((Alumnos) dato).getViveCon()],
                         dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
                         dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
-                    };
-                    
+                    };                    
                 }
                 model.addRow(fila);
             }
@@ -116,9 +113,13 @@ public class MenuBuscar extends JPanel implements EstadoInicial
     }
 
     @Override
-    public void restablecerEstadoInicial()
+    public void establecerEstadoInicial()
     {
-        historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
         filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));        
+        historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);   
+        if(historial==null)
+        {
+            JOptionPane.showMessageDialog(null, "No se han econtrado registros", "Registros Vacios", JOptionPane.WARNING_MESSAGE);
+        }
     }
 }
