@@ -91,6 +91,14 @@ public class CtrlInterfaz
             {
                 ((JLabel) obj).setEnabled(b);
             }
+            if (obj instanceof JCheckBox)
+            {
+                ((JCheckBox) obj).setEnabled(b);
+            }
+            if (obj instanceof JRadioButton)
+            {
+                ((JRadioButton) obj).setEnabled(b);
+            }
         }
     }
 

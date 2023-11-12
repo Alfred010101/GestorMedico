@@ -21,7 +21,7 @@ import poo.Personal;
  */
 public class ManipulacionArchivos
 {
-    private static final String ruta = "src/BD/";
+    private static final String RUTA= "src/BD/";
     //private static Path path = Paths.get(ruta);
     //private static boolean existe = Files.exists(path);
     
@@ -29,7 +29,7 @@ public class ManipulacionArchivos
     {
         try
         {
-            FileOutputStream fos = new FileOutputStream("../Datos/" + s);
+            FileOutputStream fos = new FileOutputStream(RUTA + s);
             ObjectOutputStream arch = new ObjectOutputStream(fos);
             arch.writeObject(obj);
             arch.close();
@@ -42,14 +42,15 @@ public class ManipulacionArchivos
         }
     }
     
-    public static void guardar(JFrame jf, Object[] obj, String s)
+    public static boolean guardar(JFrame jf, Object[]obj, String s)
     {
         try
         {
-            FileOutputStream fos = new FileOutputStream("../Datos/" + s);
+            FileOutputStream fos = new FileOutputStream(RUTA + s);
             ObjectOutputStream arch = new ObjectOutputStream(fos);
             arch.writeObject(obj);
             arch.close();
+            return true;
         } catch (FileNotFoundException ex)
         {
            // Mensajes.error(jf,"No se encontro el archivo");
@@ -57,6 +58,7 @@ public class ManipulacionArchivos
         {
            // Mensajes.error(jf,"Error..." + ex.toString());
         }
+        return false;
     }
     
     public static Object carga(JFrame jf, String s)
@@ -64,7 +66,7 @@ public class ManipulacionArchivos
         Object obj = null;
         try
         {
-            FileInputStream fis = new FileInputStream("../Datos/" + s);
+            FileInputStream fis = new FileInputStream(RUTA + s);
             ObjectInputStream arch = new ObjectInputStream(fis);
             obj = arch.readObject();
             arch.close();
@@ -83,13 +85,13 @@ public class ManipulacionArchivos
 //        Object[] obj = null;
 //        try
 //        {
-//            FileInputStream fis = new FileInputStream("src/BD/" + s);
+//            FileInputStream fis = new FileInputStream(RUTA + s);
 //            ObjectInputStream arch = new ObjectInputStream(fis);
 //            obj = (Object[]) arch.readObject();
 //            arch.close();
 //        } catch (FileNotFoundException ex)
 //        {
-//            JOptionPane.showMessageDialog(pn,"No se econtro el archivo", "Error de conexion", JOptionPane.ERROR_MESSAGE);
+//            JOptionPane.showMessageDialog(pn,"No se econtro el archivo", "Error de 2 conexion", JOptionPane.ERROR_MESSAGE);
 //        } catch(Exception ex)
 //        {
 //            JOptionPane.showMessageDialog(pn,"Error...", "Error..." + ex.toString(), JOptionPane.ERROR_MESSAGE);
@@ -97,90 +99,105 @@ public class ManipulacionArchivos
 //        return obj;
 //    }
     
-    public static Object[] cargaArch(JPanel pn, String s, boolean tipoError)
+    /**
+     * Carga silenciosa
+     * @param s
+     * @return 
+     */
+    public static Object[] cargaArch(String s)
     {
         Object[] obj = null;
         try
         {
-            FileInputStream fis = new FileInputStream(ruta + s);
+            FileInputStream fis = new FileInputStream(RUTA + s);
+            ObjectInputStream arch = new ObjectInputStream(fis);
+            obj = (Object[]) arch.readObject();
+            arch.close();
+        } catch (FileNotFoundException ex)
+        {
+        } catch(Exception ex)
+        {
+        }
+        return obj;
+    }
+    
+    public static Object[][] cargaArch(String s, boolean t)
+    {
+        Object[][] obj = null;
+        try
+        {
+            FileInputStream fis = new FileInputStream(RUTA + s);
+            ObjectInputStream arch = new ObjectInputStream(fis);
+            obj = (Object[][]) arch.readObject();
+            arch.close();
+        } catch (FileNotFoundException ex)
+        {
+        } catch(Exception ex)
+        {
+        }
+        return obj;
+    }
+    
+    public static Object[] cargaArch(JPanel pn, String s)
+    {
+        Object[] obj = null;
+        try
+        {
+            FileInputStream fis = new FileInputStream(RUTA + s);
             ObjectInputStream arch = new ObjectInputStream(fis);
             obj = (Object[])arch.readObject();
             arch.close();
         } catch (FileNotFoundException ex)
         {
-            if (tipoError)
-            {
-                JOptionPane.showMessageDialog(pn, "Si es la primera vez que realiza un registro\neste mensaje es normal.\nSi no es a si consulte al administrador ", "No se econtro el archivo", JOptionPane.WARNING_MESSAGE);
-            }else
-            {
-                JOptionPane.showMessageDialog(pn, "No se han econtrado registros", "No se econtro el archivo", JOptionPane.WARNING_MESSAGE);
-            }
+//            if (tipoError)
+//            {
+//                JOptionPane.showMessageDialog(pn, "Si es la primera vez que realiza un registro\neste mensaje es normal.\nSi no es a si consulte al administrador ", "No se econtro el archivo", JOptionPane.WARNING_MESSAGE);
+//            }else
+//            {
+                JOptionPane.showMessageDialog(pn, "No se han econtrado registros", "Registros Vacios", JOptionPane.WARNING_MESSAGE);
+            ///}
         } catch(Exception ex)
         {
             JOptionPane.showMessageDialog(pn, "Error..." + ex.toString(), "Error de conexion...", JOptionPane.ERROR_MESSAGE);
-            System.out.println( ex.toString());
         }
         return obj;
     }
     
-    public static boolean guardarReg(JPanel pn, Datos obj, String s)
-    {
-        //Object[] obj = null;
-        Datos[] array = (Datos[]) ManipulacionArchivos.cargaArch(pn, "personal.dat", true);
-       /* if(obj instanceof Personal)
-        {
-            array = (Personal[]) ManipulacionArchivos.cargaArch(pn, "personal.dat");
-            if (array == null)
-            {
-                array = new Personal[1];
-            }else
-            {
-                Datos nvoArray[] = new Personal[array.length + 1];
-                System.arraycopy(array, 0, nvoArray, 0, array.length);
-                array = nvoArray;
-            }
-            array[array.length - 1] = (Personal)obj;
-        }else if(obj instanceof Alumnos)
-        {
-            array = (Alumnos[]) ManipulacionArchivos.cargaArch(pn, "personal.dat");
-            if (array == null)
-            {
-                array = new Alumnos[1];
-            }else
-            {
-                Datos nvoArray[] = new Alumnos[array.length + 1];
-                System.arraycopy(array, 0, nvoArray, 0, array.length);
-                array = nvoArray;
-            }
-            array[array.length - 1] = (Alumnos)obj;
-        }*/
-       
-       
-            if (array == null)
-            {
-                array = new Datos[1];
-            }else
-            {
-                Datos nvoArray[] = new Datos[array.length + 1];
-                System.arraycopy(array, 0, nvoArray, 0, array.length);
-                array = nvoArray;
-            }
-            array[array.length - 1] = obj;
+    public static boolean guardarReg(JPanel pn, Object[] obj, String s)
+    {        
         try
         {
-            FileOutputStream fos = new FileOutputStream(ruta + s);
+            FileOutputStream fos = new FileOutputStream(RUTA + s);
             ObjectOutputStream arch = new ObjectOutputStream(fos);
-            arch.writeObject(array);
+            arch.writeObject(obj);
             arch.close();
         } catch (FileNotFoundException ex)
         {
             JOptionPane.showMessageDialog(pn,"No se econtro el archivo", "Error de conexion", JOptionPane.ERROR_MESSAGE);
-            System.out.println(ex.toString());
             return false;
         } catch(Exception ex)
         {
             JOptionPane.showMessageDialog(pn, "Error..." + ex.toString(), "Error...",JOptionPane.ERROR_MESSAGE);
-            System.out.println(ex.toString());
+            return false;
+        }
+        return true;
+    }
+    
+    public static boolean guardarReg(Object[][] obj, String s)
+    {        
+        try
+        {
+            FileOutputStream fos = new FileOutputStream(RUTA + s);
+            ObjectOutputStream arch = new ObjectOutputStream(fos);
+            arch.writeObject(obj);
+            arch.close();
+        } catch (FileNotFoundException ex)
+        {
+            //JOptionPane.showMessageDialog(null,"No se econtro el archivo", "Error de conexion", JOptionPane.ERROR_MESSAGE);
+            return false;
+        } catch(Exception ex)
+        {
+            ///JOptionPane.showMessageDialog(null, "Error..." + ex.toString(), "Error...",JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;
