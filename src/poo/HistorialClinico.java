@@ -4,13 +4,14 @@
  */
 package poo;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  *
  * @author zoebe
  */
-public class HistorialClinico
+public class HistorialClinico implements Serializable
 {
     private String padecimientoAct;
     private String antecedentesPer;

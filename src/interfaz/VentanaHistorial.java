@@ -67,8 +67,14 @@ public class VentanaHistorial extends JDialog
                 return false;
             }
         };
-        model.addColumn("Fecha", historial);
-
+        model.setColumnIdentifiers(new String[]{"Fecha"});
+        Object[] fila;
+        for (HistorialClinico historial1 : historial)
+        {
+            fila = new Object[]{historial1.getFecha()};
+            model.addRow(fila);
+        }
+        
         JTable tabla = new JTable(model);
                 
         tabla.addMouseListener(new MouseAdapter()

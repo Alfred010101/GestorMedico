@@ -782,7 +782,8 @@ public class MenuPersonal extends JPanel implements EstadoInicial
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                 guardarConsulta(formularioMedico, indexRegistro);
+                //System.out.println(indexRegistro);
+                guardarConsulta(formularioMedico, indexRegistro);
             }
         });
     }
@@ -851,7 +852,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                 Datos[] registros = (Datos[]) ctrl.ManipulacionArchivos.cargaArch("datos.dat");
                 if (buscarRegistro(registros, form.getCve().getText()) < 0)
                 {
-                    if (ctrl.ManipulacionArchivos.guardarReg(null, insertarRegistro(registros, crearRegistro(form, usurio)), "datos.dat") && (ctrl.ManipulacionArchivos.guardar(null, crearRegistro(), "historial.dat")))
+                    if (ctrl.ManipulacionArchivos.guardarReg(null, insertarRegistro(registros, crearRegistro(form, usurio)), "datos.dat") && (ctrl.ManipulacionArchivos.guardarReg(crearRegistro(), "historial.dat")))
                     {
                         JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro exitoso");
                         form.limpiarFormulario();
@@ -877,11 +878,12 @@ public class MenuPersonal extends JPanel implements EstadoInicial
         {
             if (form != null && form.validarFormulario())
             {
-                HistorialClinico[][] historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat");
-                //historial[index] = (HistorialClinico[]) insertarRegistro(historial[index], crearRegistro(form));
-                if(ctrl.ManipulacionArchivos.guardarReg(null, historial, "historial.dat"))
+                HistorialClinico[][] historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
+                historial[index] = insertarRegistro(historial[index], crearRegistro(form));
+                System.out.println(historial[index].length);
+                if(ctrl.ManipulacionArchivos.guardarReg(historial, "historial.dat"))
                 {
-                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Consulta guardada con exito");
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Consulta guardada exitoso");
                 } else
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "No se a podido guardar la consulta", "Error al guardar la consulta", JOptionPane.ERROR_MESSAGE);
@@ -944,6 +946,21 @@ public class MenuPersonal extends JPanel implements EstadoInicial
         } else
         {
             Datos nvoArray[] = new Datos[registros.length + 1];
+            System.arraycopy(registros, 0, nvoArray, 0, registros.length);
+            registros = nvoArray;
+        }
+        registros[registros.length - 1] = registro;
+        return registros;
+    }
+    
+    private HistorialClinico[] insertarRegistro(HistorialClinico[] registros, HistorialClinico registro)
+    {
+        if (registros == null)
+        {
+            registros = new HistorialClinico[1];
+        } else
+        {
+            HistorialClinico nvoArray[] = new HistorialClinico[registros.length + 1];
             System.arraycopy(registros, 0, nvoArray, 0, registros.length);
             registros = nvoArray;
         }

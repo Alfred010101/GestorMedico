@@ -7,31 +7,32 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import poo.Alumnos;
 import poo.Datos;
+import poo.HistorialClinico;
 import poo.Personal;
 
 /**
  *
  * @author alfredo
  */
-public class MenuBuscar extends JPanel
+public class MenuBuscar extends JPanel implements EstadoInicial
 {
     
     private DefaultTableModel model;
             
     public MenuBuscar()
     {
+        this.setBackground(Color.WHITE);
+        this.setLayout(new BorderLayout());
+        this.setBorder(new EmptyBorder(20, 20, 20, 20));
         initComponents();
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
     
     private void initComponents()
@@ -50,7 +51,8 @@ public class MenuBuscar extends JPanel
         };
         model.setColumnIdentifiers(columnNames);
 
-        filtrar((Datos[]) ManipulacionArchivos.cargaArch(null, "datos.dat"));
+        filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));
+        HistorialClinico[][] historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
         JTable tabla = new JTable(model);
                 
         tabla.addMouseListener(new MouseAdapter()
@@ -61,24 +63,20 @@ public class MenuBuscar extends JPanel
                 if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
                 {
                     int filaSeleccionada = tabla.getSelectedRow();
-                    if (filaSeleccionada != -1)
+                    if (filaSeleccionada != -1 && historial[filaSeleccionada] != null)
                     {
-                        VentanaHistorial ventanaEmergente = new VentanaHistorial((String)tabla.getValueAt(filaSeleccionada, 1), null);
+                        VentanaHistorial ventanaEmergente = new VentanaHistorial((String)tabla.getValueAt(filaSeleccionada, 1), historial[filaSeleccionada]);
                         ventanaEmergente.setVisible(true);
-                        // Obtener los datos de la fila seleccionada
-                        Object valorColumna1 = tabla.getValueAt(filaSeleccionada, 0);
-                        Object valorColumna2 = tabla.getValueAt(filaSeleccionada, 1);
-                        // Hacer algo con los valores obtenidos
-                        System.out.println("Doble clic en la fila: " + filaSeleccionada);
-                        System.out.println("Valor en la Columna1: " + valorColumna1);
-                        System.out.println("Valor en la Columna2: " + valorColumna2);
+                    }else
+                    {
+                        JOptionPane.showMessageDialog(null, "El registro seleccionado no tiene consultas medicas", "No hay consultas medicas", JOptionPane.WARNING_MESSAGE);
                     }
                 }
             }
         });
 
         JScrollPane scrollTabla = new JScrollPane(tabla);
-        this.add(scrollTabla);
+        this.add(scrollTabla, BorderLayout.CENTER);
     }
     
     private void filtrar(Datos[] registros)
@@ -115,5 +113,11 @@ public class MenuBuscar extends JPanel
                 model.addRow(fila);
             }
         }
+    }
+
+    @Override
+    public void restablecerEstadoInicial()
+    {
+        filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));
     }
 }

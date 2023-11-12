@@ -42,7 +42,7 @@ public class ManipulacionArchivos
         }
     }
     
-    public static boolean guardar(JFrame jf, Object[] obj, String s)
+    public static boolean guardar(JFrame jf, Object[]obj, String s)
     {
         try
         {
@@ -121,6 +121,23 @@ public class ManipulacionArchivos
         return obj;
     }
     
+    public static Object[][] cargaArch(String s, boolean t)
+    {
+        Object[][] obj = null;
+        try
+        {
+            FileInputStream fis = new FileInputStream(RUTA + s);
+            ObjectInputStream arch = new ObjectInputStream(fis);
+            obj = (Object[][]) arch.readObject();
+            arch.close();
+        } catch (FileNotFoundException ex)
+        {
+        } catch(Exception ex)
+        {
+        }
+        return obj;
+    }
+    
     public static Object[] cargaArch(JPanel pn, String s)
     {
         Object[] obj = null;
@@ -161,6 +178,26 @@ public class ManipulacionArchivos
         } catch(Exception ex)
         {
             JOptionPane.showMessageDialog(pn, "Error..." + ex.toString(), "Error...",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+    
+    public static boolean guardarReg(Object[][] obj, String s)
+    {        
+        try
+        {
+            FileOutputStream fos = new FileOutputStream(RUTA + s);
+            ObjectOutputStream arch = new ObjectOutputStream(fos);
+            arch.writeObject(obj);
+            arch.close();
+        } catch (FileNotFoundException ex)
+        {
+            //JOptionPane.showMessageDialog(null,"No se econtro el archivo", "Error de conexion", JOptionPane.ERROR_MESSAGE);
+            return false;
+        } catch(Exception ex)
+        {
+            ///JOptionPane.showMessageDialog(null, "Error..." + ex.toString(), "Error...",JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;

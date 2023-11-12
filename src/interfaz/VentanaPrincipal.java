@@ -40,6 +40,8 @@ public class VentanaPrincipal extends JFrame
 
     private MenuPersonal mnuPersonal = new MenuPersonal(true);
     private MenuPersonal mnuAlumnos = new MenuPersonal(false);
+    private MenuBuscar mnuBuscar = new MenuBuscar();
+    
     private int mouseX, mouseY;
 
     private enum Menu
@@ -487,7 +489,7 @@ public class VentanaPrincipal extends JFrame
         panelCenter.add(new MenuInicio(), "Panel 0");
         panelCenter.add(mnuPersonal, "Panel 1");
         panelCenter.add(mnuAlumnos, "Panel 2");
-        panelCenter.add(new MenuBuscar(), "Panel 3");
+        panelCenter.add(mnuBuscar, "Panel 3");
     }
 
     /**
@@ -502,6 +504,9 @@ public class VentanaPrincipal extends JFrame
         } else if (menuIr == Menu.ESTUDIANTES)
         {
             mnuAlumnos.restablecerEstadoInicial();
+        } else if (menuIr == Menu.BUSCAR)
+        {
+            mnuBuscar.restablecerEstadoInicial();
         }
 
         if (menuIr != menuActivo)
