@@ -15,6 +15,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -235,26 +236,29 @@ public class FormularioMedico extends JPanel
                 }
             }
         });
-        
+        JScrollPane scrollUno = new JScrollPane(padecimientoCual);
+        JScrollPane scrollDos = new JScrollPane(planTratamientoCual);
+        JScrollPane scrollTres = new JScrollPane(medicamentoCual);
+        JScrollPane scrollCuatro = new JScrollPane(antecedentesCual);
         this.add( new JLabel("Fecha"), 
                 new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.CENTER, new Insets(15, 5, 5, 5), 0, 0));
         this.add( fecha, 
                 new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 5, 5, 5), 0, 0));
         this.add( padecimientoActual, 
                 new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 15, 5, 5), 0, 0));
-        this.add(padecimientoCual, 
+        this.add(scrollUno, 
                 new GridBagConstraints(0, 2, 1, 1, 0, 0, GridBagConstraints.SOUTH, GridBagConstraints.CENTER, new Insets(5, 15, 5, 5), 0, 0));
         this.add(planTratamiento, 
                 new GridBagConstraints(1, 1, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 15, 5, 5), 0, 0));
-        this.add(planTratamientoCual, 
+        this.add(scrollDos, 
                 new GridBagConstraints(1, 2, 1, 1, 0, 0, GridBagConstraints.SOUTH, GridBagConstraints.CENTER, new Insets(5, 15, 5, 15), 0, 0));
         this.add(medicamento, 
                 new GridBagConstraints(0, 3, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 15, 5, 5), 0, 0));
-        this.add(medicamentoCual, 
+        this.add(scrollTres, 
                 new GridBagConstraints(0, 4, 1, 1, 0, 0, GridBagConstraints.CENTER, GridBagConstraints.CENTER, new Insets(5, 15, 15, 5), 0, 0));
         this.add(antecedentes, 
                 new GridBagConstraints(1, 3, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 15, 5, 5), 0, 0));
-        this.add(antecedentesCual, 
+        this.add(scrollCuatro, 
                 new GridBagConstraints(1, 4, 1, 1, 0, 0, GridBagConstraints.SOUTH, GridBagConstraints.CENTER, new Insets(5, 15, 15, 15), 0, 0));
     }
     

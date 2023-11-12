@@ -500,13 +500,13 @@ public class VentanaPrincipal extends JFrame
     {
         if (menuIr == Menu.PERSONAL)
         {
-            mnuPersonal.restablecerEstadoInicial();
+            mnuPersonal.establecerEstadoInicial();
         } else if (menuIr == Menu.ESTUDIANTES)
         {
-            mnuAlumnos.restablecerEstadoInicial();
+            mnuAlumnos.establecerEstadoInicial();
         } else if (menuIr == Menu.BUSCAR)
         {
-            mnuBuscar.restablecerEstadoInicial();
+            mnuBuscar.establecerEstadoInicial();
         }
 
         if (menuIr != menuActivo)

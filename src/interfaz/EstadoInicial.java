@@ -6,5 +6,5 @@ package interfaz;
  */
 public interface EstadoInicial
 {
-    public void restablecerEstadoInicial();    
+    public void establecerEstadoInicial();    
 }
