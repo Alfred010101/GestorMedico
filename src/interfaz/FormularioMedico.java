@@ -325,9 +325,10 @@ public class FormularioMedico extends JPanel
         return false;
     }
     
-    public void limpiarFormulario()
+    public void limpiarFormulario(boolean b)
     {
         ctrl.CtrlInterfaz.limpiarComponentes(fecha, fecha, padecimientoActual, padecimientoCual, antecedentes, antecedentesCual, medicamento, medicamentoCual, planTratamiento, planTratamientoCual);
+        habilitarFormulario(b);
     }
     
     public void habilitarFormulario(boolean b)

@@ -193,9 +193,14 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                             if(indexRegistro >= 0)
                             {
                                 ctrl.CtrlInterfaz.habilita(true, iconos[1], iconos[2]);
+                                formularioMedico.habilitarFormulario(true);
+                                btnGuardarConsulta.setEnabled(true);
                             }else
                             {
-                                formRegistro.limpiarFormulario();
+                                ctrl.CtrlInterfaz.habilita(false, iconos[1], iconos[2]);
+                                formDatos.limpiarFormulario();
+                                formularioMedico.limpiarFormulario(false);
+                                btnGuardarConsulta.setEnabled(false);
                             }
                             break;
                     }
@@ -223,6 +228,9 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                 if(tabbedPane.getSelectedIndex()==0)
                 {
                     guardarRegistro(formRegistro, tipoUsuaurio);
+                }else if(iconos[1].isEnabled() && tabbedPane.getSelectedIndex()==3)
+                {
+                    guardarConsulta(formularioMedico, indexRegistro);
                 }
             }
         });
@@ -250,7 +258,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                         formRegistro.limpiarFormulario();
                     } else if (tabbedPane.getSelectedIndex() == 3)
                     {
-
+                        formularioMedico.limpiarFormulario(true);
                     }
 
                 }
@@ -555,6 +563,8 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                              ctrl.CtrlInterfaz.habilita(false,formDatos.getViveCon());
                         }
                         formDatos.limpiarFormulario();
+                        formularioMedico.limpiarFormulario(false);
+                        btnGuardarConsulta.setEnabled(false);
                 }
             }
         });
@@ -716,18 +726,16 @@ public class MenuPersonal extends JPanel implements EstadoInicial
             {
                 if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1)
                 {
-                    // Obtener la fila seleccionada
+                    HistorialClinico[][] historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
                     int filaSeleccionada = tabla.getSelectedRow();
-                    // Hacer algo con la fila seleccionada
-                    if (filaSeleccionada != -1)
+                    int index = buscarRegistro(arrayCompletoRegistros, (String)tabla.getValueAt(filaSeleccionada, 0));
+                    if (index != -1 && historial[index] != null)
                     {
-                        // Obtener los datos de la fila seleccionada
-                        Object valorColumna1 = tabla.getValueAt(filaSeleccionada, 0);
-                        Object valorColumna2 = tabla.getValueAt(filaSeleccionada, 1);
-                        // Hacer algo con los valores obtenidos
-                        System.out.println("Doble clic en la fila: " + filaSeleccionada);
-                        System.out.println("Valor en la Columna1: " + valorColumna1);
-                        System.out.println("Valor en la Columna2: " + valorColumna2);
+                        VentanaHistorial ventanaEmergente = new VentanaHistorial(tabla.getValueAt(filaSeleccionada, 1) + " " + tabla.getValueAt(filaSeleccionada, 2) + " " + tabla.getValueAt(filaSeleccionada, 3), historial[index]);
+                        ventanaEmergente.setVisible(true);
+                    }else
+                    {
+                        JOptionPane.showMessageDialog(null, "El registro seleccionado no tiene consultas medicas", "No hay consultas medicas", JOptionPane.WARNING_MESSAGE);
                     }
                 }
             }
@@ -866,6 +874,10 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                 if(ctrl.ManipulacionArchivos.guardarReg(historial, "historial.dat"))
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "Consulta guardada exitoso");
+                    ctrl.CtrlInterfaz.habilita(false, iconos[1], iconos[2]);
+                    formDatos.limpiarFormulario();
+                    formularioMedico.limpiarFormulario(false);
+                    btnGuardarConsulta.setEnabled(false);
                 } else
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "No se a podido guardar la consulta", "Error al guardar la consulta", JOptionPane.ERROR_MESSAGE);
