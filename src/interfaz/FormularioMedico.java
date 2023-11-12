@@ -123,7 +123,7 @@ public class FormularioMedico extends JPanel
 
     private void initComponets()
     {
-        fecha = new JTextField(7);
+        fecha = new JTextField(17);
         padecimientoActual = new JCheckBox("Padecimineto Actual");
         padecimientoCual = new JTextArea(7, 35);
         padecimientoCual.setEnabled(false);
@@ -324,5 +324,18 @@ public class FormularioMedico extends JPanel
     public void limpiarFormulario()
     {
         ctrl.CtrlInterfaz.limpiarComponentes(fecha, fecha, padecimientoActual, padecimientoCual, antecedentes, antecedentesCual, medicamento, medicamentoCual, planTratamiento, planTratamientoCual);
+    }
+    
+    public void habilitarFormulario(boolean b)
+    {
+        fecha.setEditable(b);
+        padecimientoActual.setEnabled(b);
+        padecimientoCual.setEditable(b);
+        antecedentes.setEnabled(b);
+        antecedentesCual.setEditable(b);
+        medicamento.setEnabled(b);
+        medicamentoCual.setEditable(b);
+        planTratamiento.setEnabled(b);
+        planTratamientoCual.setEditable(b);
     }
 }

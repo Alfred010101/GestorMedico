@@ -26,7 +26,8 @@ public class MenuBuscar extends JPanel implements EstadoInicial
 {
     
     private DefaultTableModel model;
-            
+    HistorialClinico[][] historial;
+    
     public MenuBuscar()
     {
         this.setBackground(Color.WHITE);
@@ -52,7 +53,7 @@ public class MenuBuscar extends JPanel implements EstadoInicial
         model.setColumnIdentifiers(columnNames);
 
         filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));
-        HistorialClinico[][] historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
+        historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
         JTable tabla = new JTable(model);
                 
         tabla.addMouseListener(new MouseAdapter()
@@ -109,7 +110,6 @@ public class MenuBuscar extends JPanel implements EstadoInicial
                     };
                     
                 }
-                
                 model.addRow(fila);
             }
         }
@@ -118,6 +118,7 @@ public class MenuBuscar extends JPanel implements EstadoInicial
     @Override
     public void restablecerEstadoInicial()
     {
-        filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));
+        historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
+        filtrar((Datos[]) ManipulacionArchivos.carga(null, "datos.dat"));        
     }
 }
