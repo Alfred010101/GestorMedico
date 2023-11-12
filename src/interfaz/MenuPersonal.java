@@ -31,6 +31,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import poo.Alumnos;
 import poo.Datos;
+import poo.HistorialClinico;
 import poo.Personal;
 
 /**
@@ -85,6 +86,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
     private JScrollPane scrollTabla;
 
     private JButton btnGuardarCambios;
+    private JButton btnGuardarConsulta;
     private Datos[] listaActualMostrar;
     private Datos[] arrayCompletoRegistros;
     private boolean tipoOrdenamiento = true;
@@ -761,13 +763,13 @@ public class MenuPersonal extends JPanel implements EstadoInicial
         JPanel contenedor2 = new JPanel();
         JPanel contenedor3 = new JPanel();
 
-        JButton btnGuardar = new JButton("Guardar Consulta Medica");
+        btnGuardarConsulta = new JButton("Guardar Consulta Medica");
         formDatos = new FormularioDatos(tipoUsuaurio, null);
         formularioMedico = new FormularioMedico();
         formularioMedico.setBorder(BorderFactory.createTitledBorder(""));
         contenedor1.add(formDatos);
         contenedor2.add(formularioMedico);
-        contenedor3.add(btnGuardar);
+        contenedor3.add(btnGuardarConsulta);
 
         contenedor.setLayout(new BoxLayout(contenedor, BoxLayout.Y_AXIS));
         contenedor.add(contenedor1);
@@ -775,12 +777,12 @@ public class MenuPersonal extends JPanel implements EstadoInicial
         contenedor.add(contenedor3);
         tabbedPane.addTab("Nueva Consulta Medica", null, new JScrollPane(contenedor));
 
-        btnGuardar.addActionListener(new ActionListener()
+        btnGuardarConsulta.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                //guardarNuevoRegistro();
+                 guardarConsulta(formularioMedico, indexRegistro);
             }
         });
     }
@@ -849,10 +851,11 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                 Datos[] registros = (Datos[]) ctrl.ManipulacionArchivos.cargaArch("datos.dat");
                 if (buscarRegistro(registros, form.getCve().getText()) < 0)
                 {
-                    if (ctrl.ManipulacionArchivos.guardarReg(null, insertarRegistro(registros, crearRegistro(form, usurio)), "datos.dat"))
+                    if (ctrl.ManipulacionArchivos.guardarReg(null, insertarRegistro(registros, crearRegistro(form, usurio)), "datos.dat") && (ctrl.ManipulacionArchivos.guardar(null, crearRegistro(), "historial.dat")))
                     {
                         JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro exitoso");
                         form.limpiarFormulario();
+                        
                     } else
                     {
                         JOptionPane.showMessageDialog(panelAreaTrabajo, "No se a podido guardar el Registo", "Error al guardar el registro", JOptionPane.ERROR_MESSAGE);
@@ -860,6 +863,28 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                 } else
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "La clave ingresada no se encuentra disponible", "Clave duplicada", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        }
+    }
+    
+    private void guardarConsulta(FormularioMedico form, int index)
+    {
+        if (form != null && form.camposVacios())
+        {
+            JOptionPane.showMessageDialog(null, "Todos los campos especificados deben ser llenados");
+        } else
+        {
+            if (form != null && form.validarFormulario())
+            {
+                HistorialClinico[][] historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat");
+                //historial[index] = (HistorialClinico[]) insertarRegistro(historial[index], crearRegistro(form));
+                if(ctrl.ManipulacionArchivos.guardarReg(null, historial, "historial.dat"))
+                {
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Consulta guardada con exito");
+                } else
+                {
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "No se a podido guardar la consulta", "Error al guardar la consulta", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -887,7 +912,30 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                     form.getDiabetes().isSelected(), (form.getOtras().isSelected()) ? form.getOtrasCual().getText() : "No");
         }
     }
+    
+    private HistorialClinico [][] crearRegistro()
+    {
+        HistorialClinico[][] historial =(HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat");
+        if(historial == null)
+        {
+            historial = new HistorialClinico[1][];
+            historial[0] = null;
+        }else
+        {
+            HistorialClinico[][] tmphistorial = new HistorialClinico[historial.length + 1][];
+            System.arraycopy(historial, 0, tmphistorial, 0, historial.length);
+            tmphistorial[historial.length] =null;
+            historial = tmphistorial;
+        }
+        System.out.println(historial.length);
+        return historial;
+    }
 
+    private HistorialClinico crearRegistro(FormularioMedico form)
+    {
+        return new HistorialClinico(form.getPadecimientoCual().getText(), form.getAntecedentesCual().getText(), form.getMedicamentoCual().getText(), form.getPlanTratamientoCual().getText(), form.getDateFecha());
+    }
+    
     private Object[] insertarRegistro(Object[] registros, Object registro)
     {
         if (registros == null)

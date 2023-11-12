@@ -4,6 +4,8 @@
  */
 package poo;
 
+import java.util.Date;
+
 /**
  *
  * @author zoebe
@@ -14,13 +16,13 @@ public class HistorialClinico
     private String antecedentesPer;
     private String medicamento;
     private String planTratamiento;
-    private Datos fecha;
+    private Date fecha;
 
     public HistorialClinico()
     {
     }
 
-    public HistorialClinico(String padecimientoAct, String antecedentesPer, String medicamento, String planTratamiento, Datos fecha)
+    public HistorialClinico(String padecimientoAct, String antecedentesPer, String medicamento, String planTratamiento, Date fecha)
     {
         this.padecimientoAct = padecimientoAct;
         this.antecedentesPer = antecedentesPer;
@@ -96,7 +98,7 @@ public class HistorialClinico
     /**
      * @return the fecha
      */
-    public Datos getFecha()
+    public Date getFecha()
     {
         return fecha;
     }
@@ -104,7 +106,7 @@ public class HistorialClinico
     /**
      * @param fecha the fecha to set
      */
-    public void setFecha(Datos fecha)
+    public void setFecha(Date fecha)
     {
         this.fecha = fecha;
     }

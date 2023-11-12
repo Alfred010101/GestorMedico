@@ -3,9 +3,17 @@ package interfaz;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.ImageIcon;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -25,7 +33,8 @@ public class FormularioMedico extends JPanel
     private JCheckBox planTratamiento;
     private JTextArea planTratamientoCual;
     private JTextField fecha;
-
+    private Date dateFecha;
+    
     public FormularioMedico()
     {
         this.setLayout(new GridBagLayout());
@@ -103,6 +112,14 @@ public class FormularioMedico extends JPanel
     {
         return fecha;
     }
+    
+    /**
+     * @return the dateFecha
+     */
+    public Date getDateFecha()
+    {
+        return dateFecha;
+    }
 
     private void initComponets()
     {
@@ -119,6 +136,105 @@ public class FormularioMedico extends JPanel
         planTratamiento = new JCheckBox("Plan de tratamiento");
         planTratamientoCual = new JTextArea(7, 35);
         planTratamientoCual.setEnabled(false);
+        
+        fecha.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                ctrl.Validaciones.validarFecha(e, fecha.getText(), 10);
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                enterKeyPressed(e, fecha.getText(), padecimientoActual);
+            }
+        });
+        padecimientoActual.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(padecimientoCual, e);
+            }
+        });
+        padecimientoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(padecimientoActual);
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(planTratamiento);
+                    }
+                }
+            }
+        });
+        planTratamiento.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(planTratamientoCual, e);
+            }
+        });
+        planTratamientoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(planTratamiento);                        
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(medicamento);
+                    }
+                }
+            }
+        });
+        medicamento.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(medicamentoCual, e);
+            }
+        });
+        medicamentoCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        ctrl.CtrlInterfaz.cambia(medicamento);                        
+                    } else {
+                        e.consume();
+                        ctrl.CtrlInterfaz.cambia(antecedentes);
+                    }
+                }
+            }
+        });
+        antecedentes.addItemListener(new ItemListener()
+        {
+            @Override
+            public void itemStateChanged(ItemEvent e)
+            {
+                ctrl.CtrlInterfaz.itemStateChanged(antecedentesCual, e);
+            }
+        });
+        antecedentesCual.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    if (e.isShiftDown()) {
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusPreviousComponent();
+                    } else {
+                        e.consume();
+                        KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
+                    }
+                }
+            }
+        });
         
         this.add( new JLabel("Fecha"), 
                 new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.CENTER, new Insets(15, 5, 5, 5), 0, 0));
@@ -140,7 +256,73 @@ public class FormularioMedico extends JPanel
                 new GridBagConstraints(1, 3, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.CENTER, new Insets(15, 15, 5, 5), 0, 0));
         this.add(antecedentesCual, 
                 new GridBagConstraints(1, 4, 1, 1, 0, 0, GridBagConstraints.SOUTH, GridBagConstraints.CENTER, new Insets(5, 15, 15, 15), 0, 0));
-        
-        
+    }
+    
+    private void enterKeyPressed(KeyEvent e, String s, Object obj)
+    {
+        if (!s.isEmpty())
+        {
+            ctrl.Validaciones.enter(this, e, obj);
+        }
+    }
+    
+    public boolean validarFormulario()
+    {       
+        SimpleDateFormat formato1 = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formato2 = new SimpleDateFormat("dd-MM-yyyy");
+        formato1.setLenient(false);
+        formato2.setLenient(false);
+
+        try
+        {
+            dateFecha = formato1.parse(this.getFecha().getText());
+        } catch (ParseException ex1)
+        {
+            try
+            {
+                dateFecha = formato2.parse(this.getFecha().getText());
+            } catch (ParseException ex2)
+            {
+                JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto");
+                ctrl.CtrlInterfaz.selecciona(this.fecha);
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public boolean camposVacios()
+    {
+        if(this.getFecha().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(fecha);
+            return true;
+        }
+        if(this.getPadecimientoActual().isSelected() && this.getPadecimientoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(padecimientoCual);
+            return true;
+        }
+        if(this.getPlanTratamiento().isSelected() && this.getPlanTratamientoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(planTratamientoCual);
+            return true;
+        }
+        if(this.getMedicamento().isSelected() && this.getMedicamentoCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(medicamentoCual);
+            return true;
+        }
+        if(this.getAntecedentes().isSelected() && this.getAntecedentesCual().getText().trim().isEmpty())
+        {
+            ctrl.CtrlInterfaz.selecciona(antecedentesCual);
+            return true;
+        }
+        return false;
+    }
+    
+    public void limpiarFormulario()
+    {
+        ctrl.CtrlInterfaz.limpiarComponentes(fecha, fecha, padecimientoActual, padecimientoCual, antecedentes, antecedentesCual, medicamento, medicamentoCual, planTratamiento, planTratamientoCual);
     }
 }

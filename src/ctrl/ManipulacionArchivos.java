@@ -42,7 +42,7 @@ public class ManipulacionArchivos
         }
     }
     
-    public static void guardar(JFrame jf, Object[] obj, String s)
+    public static boolean guardar(JFrame jf, Object[] obj, String s)
     {
         try
         {
@@ -50,6 +50,7 @@ public class ManipulacionArchivos
             ObjectOutputStream arch = new ObjectOutputStream(fos);
             arch.writeObject(obj);
             arch.close();
+            return true;
         } catch (FileNotFoundException ex)
         {
            // Mensajes.error(jf,"No se encontro el archivo");
@@ -57,6 +58,7 @@ public class ManipulacionArchivos
         {
            // Mensajes.error(jf,"Error..." + ex.toString());
         }
+        return false;
     }
     
     public static Object carga(JFrame jf, String s)
