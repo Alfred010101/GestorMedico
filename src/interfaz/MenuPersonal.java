@@ -87,9 +87,8 @@ public class MenuPersonal extends JPanel implements EstadoInicial
 
     private JButton btnGuardarCambios;
     private JButton btnGuardarConsulta;
-    private Datos[] listaActualMostrar;
     private Datos[] arrayCompletoRegistros;
-    private boolean tipoOrdenamiento = true;
+    private boolean tipoOrdenamiento;
     private final boolean tipoUsuaurio;
     private int indexRegistro;
     private int filtros;
@@ -102,7 +101,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
         this.tipoUsuaurio = tipoUsuario;
 
         arrayCompletoRegistros = (Datos[]) ctrl.ManipulacionArchivos.cargaArch("datos.dat");
-
+        tipoOrdenamiento = true;
         initPanelNorth();
         initPanelSouth();
 
@@ -121,7 +120,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
 
         String[] txt =
         {
-            "Buscar Registro", "Guardar Registro", "Limpiar Formulario", "Actualizar Registro", "Restablecer Registro", "Ordenar Frecuencia Descendente", "Mostar Ambos", "Mostrar Hombres", "mostrar Mujeres"
+            "Buscar Registro", "Guardar Registro", "Limpiar Formulario", "Actualizar Registro", "Deshacer", "Ordenar Frecuencia", "Mostar Ambos", "Mostrar Hombres", "Mostrar Mujeres"
         };
         String[] nomIcon =
         {
@@ -330,29 +329,21 @@ public class MenuPersonal extends JPanel implements EstadoInicial
             @Override
             public void mouseClicked(MouseEvent evt)
             {
-                if (iconos[5].isEnabled() && listaActualMostrar != null)
+                if (iconos[5].isEnabled())
                 {
-                    Datos tmp;
-                    for (int i = 0; i < listaActualMostrar.length; i++)
+                    padecimientos.setSelectedIndex(0);
+                    iconos[6].setIcon(new ImageIcon(pathImagenes + "ambos_Hover.png"));
+                    iconos[7].setIcon(new ImageIcon(pathImagenes + "hombre.png"));
+                    iconos[8].setIcon(new ImageIcon(pathImagenes + "mujer.png"));
+                    filtros = 0;
+                    if(tipoOrdenamiento)
                     {
-                        for (int j = 0; j < listaActualMostrar.length - 1; j++)
-                        {
-                            if (tipoOrdenamiento && listaActualMostrar[j].getNom().compareTo(listaActualMostrar[j + 1].getNom()) > 0)
-                            {
-                                tmp = listaActualMostrar[j];
-                                listaActualMostrar[j] = listaActualMostrar[j + 1];
-                                listaActualMostrar[j + 1] = tmp;
-                            } else if (!tipoOrdenamiento && listaActualMostrar[j].getNom().compareTo(listaActualMostrar[j + 1].getNom()) < 0)
-                            {
-                                tmp = listaActualMostrar[j];
-                                listaActualMostrar[j] = listaActualMostrar[j + 1];
-                                listaActualMostrar[j + 1] = tmp;
-                            }
-                        }
+                        ordenar((HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat"), (Datos[])ctrl.ManipulacionArchivos.cargaArch("datos.dat"));
+                    }else
+                    {
+                        ordenar2((HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat"), (Datos[])ctrl.ManipulacionArchivos.cargaArch("datos.dat"));
                     }
-                    tipoOrdenamiento = (!tipoOrdenamiento);
-                    model.setRowCount(0);
-                    llenarTabla(listaActualMostrar, tipoUsuaurio);
+                    tipoOrdenamiento = !tipoOrdenamiento;
                 }
             }
         });
@@ -920,10 +911,9 @@ public class MenuPersonal extends JPanel implements EstadoInicial
         {
             HistorialClinico[][] tmphistorial = new HistorialClinico[historial.length + 1][];
             System.arraycopy(historial, 0, tmphistorial, 0, historial.length);
-            tmphistorial[historial.length] =null;
+            tmphistorial[historial.length] = null;
             historial = tmphistorial;
         }
-        System.out.println(historial.length);
         return historial;
     }
 
@@ -1024,7 +1014,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                 if (ctrl.ManipulacionArchivos.guardarReg(null, modifcarRegistro(registros, crearRegistro(form, usurio), index), "datos.dat"))
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "Registro actualizado exitosamente");
-                    //form.limpiarFormulario();
+                    form.limpiarFormulario();
                 } else
                 {
                     JOptionPane.showMessageDialog(panelAreaTrabajo, "No se a podido actualizar el Registo", "Error al actualizar el registro", JOptionPane.ERROR_MESSAGE);
@@ -1042,39 +1032,79 @@ public class MenuPersonal extends JPanel implements EstadoInicial
         return registros;
     }
 
-    private void llenarTabla(Datos[] lista, boolean usuario)
+    
+    private void ordenar(HistorialClinico[][] historial, Datos[] registros)
     {
-        listaActualMostrar = lista;
-        Object[] fila = null;
-        for (Datos dato : lista)
+        HistorialClinico[] tmpHis;
+        Datos tmpDato;
+        for (int i = 0; i < registros.length; i++)
         {
-            if (usuario && dato instanceof Personal)
+            for (int j = 0; j < registros.length - 1; j++)
             {
-                fila = new Object[]
-                {
-                    dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(),
-                    dato.getSexo(), FormularioDatos.ESTATUS[((Personal) dato).getEstatus()],
-                    dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
-                    dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
-                };
-
-            } else if (!usuario && dato instanceof Alumnos)
-            {
-                fila = new Object[]
-                {
-                    dato.getCve(), dato.getNom(), dato.getPrimerAp(), dato.getSegundoAp(),
-                    dato.getSexo(), FormularioDatos.CARRERAS[((Alumnos) dato).getCarrera()], FormularioDatos.VIVECON[((Alumnos) dato).getViveCon()],
-                    dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
-                    dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
-                };
-
+                if (compareLongitudes(historial[j], historial[j + 1])) 
+                {                
+                    tmpHis = historial[j];
+                    tmpDato = registros[j];
+                    historial[j] = historial[j + 1];
+                    registros[j] = registros[j + 1];
+                    historial[j + 1] = tmpHis;
+                    registros[j + 1] = tmpDato;
+                }               
             }
-            if (fila != null)
+        }    
+        filtrar(registros, 0, 0, tipoUsuaurio);
+    }    
+    
+    private void ordenar2(HistorialClinico[][] historial, Datos[] registros)
+    {
+        HistorialClinico[] tmpHis;
+        Datos tmpDato;
+        for (int i = 0; i < registros.length; i++)
+        {
+            for (int j = 0; j < registros.length - 1; j++)
             {
-                model.addRow(fila);
-                fila = null;
+                if (compareLongitudes2(historial[j], historial[j + 1])) 
+                {                
+                    tmpHis = historial[j];
+                    tmpDato = registros[j];
+                    historial[j] = historial[j + 1];
+                    registros[j] = registros[j + 1];
+                    historial[j + 1] = tmpHis;
+                    registros[j + 1] = tmpDato;
+                }               
+            }
+        }    
+        filtrar(registros, 0, 0, tipoUsuaurio);
+    }   
+    
+    public boolean compareLongitudes(HistorialClinico[] h1, HistorialClinico[] h2) 
+    {
+        if (h1 == null && h2 != null)
+        {
+            return true;
+        }
+        if(h1 != null && h2 != null) {
+            if(h1.length < h2.length)
+            {
+                return true;
             }
         }
+        return false;      
+    }
+    
+    public boolean compareLongitudes2(HistorialClinico[] h1, HistorialClinico[] h2) 
+    {
+        if (h1 != null && h2 == null)
+        {
+            return true;
+        }
+        if(h1 != null && h2 != null) {
+            if(h1.length > h2.length)
+            {
+                return true;
+            }
+        }
+        return false;      
     }
 
     private int buscarRegistro(Datos[] registros, String clave)
