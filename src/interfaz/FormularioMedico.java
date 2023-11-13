@@ -287,7 +287,7 @@ public class FormularioMedico extends JPanel
                 dateFecha = formato2.parse(this.getFecha().getText());
             } catch (ParseException ex2)
             {
-                JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto");
+                JOptionPane.showMessageDialog(null, "Formato de fecha incorrecto\nDD/MM/YYYY o DD-MM-YYYY ");
                 ctrl.CtrlInterfaz.selecciona(this.fecha);
                 return false;
             }

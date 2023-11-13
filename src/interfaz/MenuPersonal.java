@@ -861,10 +861,9 @@ public class MenuPersonal extends JPanel implements EstadoInicial
             {
                 HistorialClinico[][] historial = (HistorialClinico[][]) ctrl.ManipulacionArchivos.cargaArch("historial.dat", true);
                 historial[index] = insertarRegistro(historial[index], crearRegistro(form));
-                System.out.println(historial[index].length);
                 if(ctrl.ManipulacionArchivos.guardarReg(historial, "historial.dat"))
                 {
-                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Consulta guardada exitoso");
+                    JOptionPane.showMessageDialog(panelAreaTrabajo, "Consulta guardada exitosamente");
                     ctrl.CtrlInterfaz.habilita(false, iconos[1], iconos[2]);
                     formDatos.limpiarFormulario();
                     formularioMedico.limpiarFormulario(false);
@@ -964,7 +963,7 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                mostrarDatosModificar(registros[index], form);
             } else
             {
-                JOptionPane.showMessageDialog(null, "Clave NO asociada a ningun registro de " + ((tipoUsuaurio) ? "Personal" : "Alumnos") + ".\nEs importante ingresar la clave tal y como aparecia al momento de realizar el registro", "Clave no encotrada", JOptionPane.ERROR_MESSAGE);             
+                JOptionPane.showMessageDialog(null, "Clave NO asociada a ningun registro de " + ((tipoUsuaurio) ? "Personal" : "Alumnos") + ".\nEs importante ingresar la clave tal y como aparecia\nal momento de realizar el registro", "Clave no encotrada", JOptionPane.ERROR_MESSAGE);             
                 index = -1;
             }
         }
@@ -1155,7 +1154,6 @@ public class MenuPersonal extends JPanel implements EstadoInicial
                             dato.isDesnutriccion() ? "Si" : "No", dato.isSobrepeso() ? "Si" : "No", dato.isAlergias() ? "Si" : "No",
                             dato.isObecidad() ? "Si" : "No", dato.isDiabetes() ? "Si" : "No", dato.getOtras()
                         };
-
                     }
                 }
                 if (fila != null)

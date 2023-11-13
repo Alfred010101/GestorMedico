@@ -525,7 +525,7 @@ public class VentanaPrincipal extends JFrame
     {
         try
         {
-            String rutaRelativa = "src/Manual/C_+_+.pdf";
+            String rutaRelativa = "src/Manual/MANUAL_GESTOR_MEDICO.pdf";
             File archivo = new File(rutaRelativa);
             URI uri = archivo.toURI();
             Desktop.getDesktop().browse(uri);

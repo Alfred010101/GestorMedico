@@ -54,11 +54,11 @@ public class MenuInicio extends JPanel
     {
         int[] datosX =
         {
-            26, 10, 20, 30, 40, 50
+            6, 10, 12, 3, 9, 15
         };
         int[] datosY =
         {
-            20, 45, 30, 70, 90, 75
+            20, 5, 11, 6, 2, 17
         };
         GraficoBarras graficoBarras = new GraficoBarras("Padecimientos Alumnos", datosX, datosY);
         panelA.add(graficoBarras);
@@ -68,11 +68,11 @@ public class MenuInicio extends JPanel
     {
         int[] datosX =
         {
-            0, 10, 20, 30, 40, 50
+            0, 10, 5, 9, 14, 15
         };
         int[] datosY =
         {
-            20, 45, 30, 62, 23, 57
+            20, 4, 3, 12, 20, 7
         };
         GraficoBarras graficoBarras = new GraficoBarras("Padecimientos Personal", datosX, datosY);
         add(graficoBarras);
@@ -84,22 +84,22 @@ public class MenuInicio extends JPanel
         int[][] datos =
         {
             {
-                14, 80, 20, 30, 40, 60
+                14, 8, 20, 30, 16, 10,5
             },
             {
-                0, 23, 12, 4, 1, 4
+                0, 23, 12, 4, 1, 4,13
             },
             {
-                0, 5, 23, 4, 1, 5
+                6, 5, 23, 4, 1, 5,1
             },
             {
-                0, 52, 3, 4, 1, 4
+                0, 22, 3, 4, 1, 4,9
             },
             {
-                0, 14, 20, 20, 30, 6
+                0, 14, 20, 20, 30, 6,16
             },
             {
-                1, 20, 0, 10, 4, 10
+                1, 20, 0, 10, 4, 10,3
             }
         };
         GraficoDeLineas graficoBarras = new GraficoDeLineas("Comparacion de consultas semanales", datos, relleno);
@@ -114,7 +114,7 @@ public class MenuInicio extends JPanel
         };        
         int[] datos =
         {
-            14, 80, 20, 30, 40, 60
+            50, 30, 20, 50, 25, 60
         };
         GraficoPastel graficoBarras = new GraficoPastel("Cantidad de registros", encabezados, datos, relleno);
         panelD.add(graficoBarras);
